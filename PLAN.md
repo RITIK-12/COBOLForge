@@ -53,13 +53,20 @@ All systems: same `prompt.py`, temperature 0, max_tokens 4096. No weakened basel
 
 ## 4. Grader (KJ)
 
-- **Sandbox:** GnuCOBOL 3.2 in Docker (`grader/Dockerfile`), one persistent container:
-  `--network none --memory 2g --cpus 4 --pids-limit 256`, only `grader/work` mounted.
-  `docker exec` per program (never a new container per test).
+- **Sandbox: native + static guard + sandbox-exec.** GnuCOBOL 3.2.0 from Homebrew, run directly on macOS.
+  - *Static guard* (before compiling): reject any `CALL` except the problem's own entry point
+    (the only target COBOLEval callers use), `SELECT … ASSIGN`, `OPEN`, `DELETE FILE`, `EXEC`.
+    Matched with comments stripped and literals blanked. Returns `compiled=false, passed=false, error="blocked"`.
+  - *sandbox-exec* on the run step: no network, no file writes outside the per-grade temp dir
+    (`GRADER_SANDBOX=0` turns it off, e.g. on Linux).
+  - 10s run timeout; after a problem's first timeout its remaining tests are skipped. Limits on CPU, file size and core dumps.
+  - Each `grade()` call gets its own temp dir, so calls run in parallel (`grade_many`).
 - **API:** `grade(program, problem) -> {compiled, passed, n_pass, n_tests, error}`.
   Same function is the data filter, the eval metric and the RL reward. Safe for concurrent calls.
-- **Self-test:** `python -m grader.grade --self-test` must pass reference solutions at 100%.
-- Target: under ~2s per problem; batch a problem's tests into one exec if slower.
+- **Self-test:** `python -m grader.grade --self-test`: the reference passes; wrong, broken, blocked and hanging
+  programs fail as expected; the sandbox blocks escapes; all 146 callers build against a stub.
+  HumanEval/74 and /160 have broken dataset callers (out-of-bounds subscripts) and can't pass for any system.
+- Measured: ~1s per problem (one compile + run per test), ~25s for all 146 in parallel.
 
 ---
 
@@ -152,7 +159,7 @@ small commits, push to main often. Secrets only from env (`FIREWORKS_API_KEY`, `
 
 | Time | KJ (RL / post-training) | Ritik (SFT) | Sync / gate |
 | --- | --- | --- | --- |
-| 11:21–11:45 | Docker grader, `grade.py`, self-test; Fireworks setup; base + teacher on 30 problems | Confirm student trainable; filter + convert MBPP | |
+| 11:21–11:45 | Native grader, `grade.py`, self-test; Fireworks setup; base + teacher on 30 problems | Confirm student trainable; filter + convert MBPP | |
 | **11:45** | | | **Sync 1:** go/no-go, pick teacher, freeze prompt |
 | 11:45–12:45 | Full 146 baselines (base, teacher, frontier); `stats.py` | Rejection sampling, dedupe, `train.jsonl`, **launch SFT** | |
 | **12:45** | | | **Sync 2:** data yield, baseline numbers, SFT job ID |
@@ -189,7 +196,7 @@ small commits, push to main often. Secrets only from env (`FIREWORKS_API_KEY`, `
 | --- | --- |
 | MBPP → harness conversion is slow or lossy | Filter to simple types; reuse COBOLEval converter; 90-min cap |
 | Fireworks queue / deployment time | Serverless training; score in-session |
-| Docker grader too slow for RL rollouts | Persistent container, batched exec, parallel calls |
+| Grader too slow for RL rollouts | Native (no container overhead), parallel `grade_many`, early stop on timeout |
 | Gain not significant at n=146 | Report honestly; show compile-rate gain and failure breakdown |
 | Contamination concerns | Dedupe MBPP vs HumanEval; never touch COBOLEval for training |
 | GRPO degrades the model | Keep SFT as final; report GRPO as an experiment |
