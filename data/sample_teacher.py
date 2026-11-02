@@ -42,11 +42,14 @@ async def call(client, sem, args, problem, k):
     body = {"model": args.model, "messages": build_messages(problem["prompt"]),
             "temperature": args.temperature, "max_tokens": args.max_tokens}
     async with sem:
-        for attempt in range(6):
+        for attempt in range(30):
             t = time.time()
             try:
                 r = await client.post(URL, json=body)
-                if r.status_code == 429 or r.status_code >= 500:
+                if r.status_code == 429:  # generated-token rate limit: wait as told, don't count toward giving up
+                    await asyncio.sleep(float(r.headers.get("retry-after", 5)) + random.random() * 3)
+                    continue
+                if r.status_code >= 500:
                     raise httpx.HTTPStatusError(str(r.status_code), request=r.request, response=r)
                 r.raise_for_status()
                 d = r.json()

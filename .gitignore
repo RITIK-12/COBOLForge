@@ -4,3 +4,4 @@ __pycache__/
 .venv/
 grader/work/
 data/cache/
+sft/cobol-mbpp-sft-*.jsonl
