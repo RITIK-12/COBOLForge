@@ -206,8 +206,9 @@ def grade(program: str, problem: dict) -> dict:
                     timeout=RUN_TIMEOUT_S, preexec_fn=_limits, stdin=subprocess.DEVNULL,
                 )
             except subprocess.TimeoutExpired:
-                errors.append(f"test {i}: run timeout")
-                continue
+                # one hang costs RUN_TIMEOUT_S per test; skip the rest (they'd fail anyway)
+                errors.append(f"test {i}: run timeout; skipped {len(tests) - i - 1} remaining")
+                break
             if r.returncode != 0:
                 errors.append(f"test {i}: runtime rc={r.returncode} {(r.stderr or r.stdout).strip()[:300]}")
                 continue
@@ -268,6 +269,8 @@ def _self_test() -> int:
         t = time.time()
         r = grade(prog, p0)
         good_case = all(r[k] == v for k, v in want.items())
+        if label == "infinite loop":  # early stop: one timeout, not one per test
+            good_case &= time.time() - t < RUN_TIMEOUT_S + 5
         ok &= good_case
         print(f"{'PASS' if good_case else 'FAIL'}  {label:14s} {time.time()-t:5.1f}s  {r}")
 
