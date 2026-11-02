@@ -10,7 +10,7 @@ Fine-tune a small open model on Fireworks to write correct COBOL, and measure th
 | Grader `grader/grade.py` | Done; self-test passes (144/146 callers build, HumanEval/74 and /160 are broken upstream) | KJ |
 | Frozen prompt `prompt.py` | Done: `build_messages(problem["prompt"])` -> [system, user]; model answers a full program in one ```` ```cobol ```` block | Ritik |
 | MBPP -> COBOLEval converter `data/convert_mbpp.py` | Done: 459 problems, 1,371 tests | Ritik |
-| Teacher rejection sampling `data/sample_teacher.py` | Running (`kimi-k3`) | Ritik |
+| Teacher rejection sampling `data/sample_teacher.py` | Done (`kimi-k3`): 709 SFT rows | Ritik |
 | SFT | Managed LoRA SFT on Nemotron (see below) | Ritik |
 | Baselines / eval / stats | `eval/`, `results/` | KJ |
 
@@ -72,8 +72,8 @@ Then every caller is compiled against a stub solution; problems whose callers fa
 | --- | --- |
 | MBPP rows | 974 |
 | Converted + callers compile | 459 problems, 1,371 tests |
-| Teacher (`kimi-k3`, T=0.7) samples: compiled / passed | 709: 645 / 559 (interim; round 1 still running) |
-| `train.jsonl` | **552 rows from 317 problems** (≤ 2 per problem) |
+| Teacher (`kimi-k3`, T=0.7, 2 per problem) samples: compiled / passed | 918: 832 / 718 (78%); 47 hit the 8,192-token limit |
+| `train.jsonl` | **709 rows from 413 of 459 problems** (≤ 2 distinct programs per problem); ~1.3M training tokens over 2 epochs |
 
 `train.jsonl` rows are `{id, messages: [system, user, assistant]}` with system + user from
 `prompt.py` and assistant = the passing program in one ```` ```cobol ```` block, at most 2 distinct
