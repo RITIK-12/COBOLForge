@@ -27,6 +27,16 @@ from concurrent.futures import ThreadPoolExecutor
 RUN_TIMEOUT_S = 10
 COMPILE_TIMEOUT_S = 30
 COBC = os.environ.get("COBC") or shutil.which("cobc") or "/opt/homebrew/bin/cobc"
+# macOS sandbox for the run step: no network, no writes outside the grade's temp dir.
+# GRADER_SANDBOX=0 disables it (e.g. on Linux, where sandbox-exec doesn't exist).
+SANDBOX_EXEC = "/usr/bin/sandbox-exec"
+USE_SANDBOX = os.environ.get("GRADER_SANDBOX", "1") != "0" and os.path.exists(SANDBOX_EXEC)
+_PROFILE = """(version 1)
+(allow default)
+(deny network*)
+(deny file-write*)
+(allow file-write* (subpath "{d}") (literal "/dev/null") (literal "/dev/stdout") (literal "/dev/stderr"))
+"""
 
 
 class ParseError(Exception):
@@ -188,8 +198,11 @@ def grade(program: str, problem: dict) -> dict:
             out["compiled"] = True
 
             try:
+                argv = [exe]
+                if USE_SANDBOX:
+                    argv = [SANDBOX_EXEC, "-p", _PROFILE.format(d=os.path.realpath(d)), exe]
                 r = subprocess.run(
-                    [exe], cwd=d, capture_output=True, text=True,
+                    argv, cwd=d, capture_output=True, text=True,
                     timeout=RUN_TIMEOUT_S, preexec_fn=_limits, stdin=subprocess.DEVNULL,
                 )
             except subprocess.TimeoutExpired:
@@ -247,6 +260,7 @@ def _self_test() -> int:
         ("blocked CALL", good.replace("MOVE 0 TO RESULT\n", 'MOVE 0 TO RESULT\n           CALL "SYSTEM" USING "echo pwned"\n', 1), dict(compiled=False, passed=False, error="blocked")),
         ("blocked OPEN", good.replace("MOVE 0 TO RESULT\n", "MOVE 0 TO RESULT\n           OPEN OUTPUT F\n", 1), dict(compiled=False, passed=False, error="blocked")),
         ("comment words", good.replace("MOVE 0 TO RESULT\n", "MOVE 0 TO RESULT\n      * OPEN the file, CALL system, EXEC SQL\n           DISPLAY 'OPEN CALL EXEC' WITH NO ADVANCING *> DELETE FILE\n", 1), dict(compiled=True, passed=True, n_pass=4)),
+        ("blocked CBL_ CALL", good.replace("MOVE 0 TO RESULT\n", 'MOVE 0 TO RESULT\n           CALL "CBL_CREATE_FILE" USING "/tmp/cobgrade_escape" 2 0 0 FH\n', 1), dict(compiled=False, error="blocked")),
         ("infinite loop", good.replace("MOVE 0 TO RESULT\n", "MOVE 0 TO RESULT\n           PERFORM UNTIL 1 = 2 CONTINUE END-PERFORM\n", 1), dict(compiled=True, passed=False, n_pass=0)),
     ]
     ok = True
@@ -265,6 +279,20 @@ def _self_test() -> int:
         (blocked_reason("       MOVE 1 TO OPEN-COUNT CALL-IDX", p0["entry_point"]) is None, "hyphenated names allowed"),
         (blocked_reason("       DISPLAY 'CALL X' CALL \"SYSTEM\"", p0["entry_point"]) is not None, "CALL after literal blocked"),
     ]
+    if USE_SANDBOX:  # bypass the static guard to check the sandbox itself
+        import subprocess as sp
+        with tempfile.TemporaryDirectory() as d:
+            out_path = os.path.join(tempfile.gettempdir(), "cobgrade_escape_test")
+            if os.path.exists(out_path):
+                os.remove(out_path)
+            src = os.path.join(d, "esc.c")
+            open(src, "w").write('#include <stdio.h>\nint main(){FILE*f=fopen("%s","w");'
+                                 'if(f){fputs("x",f);fclose(f);}return 0;}' % out_path)
+            sp.run(["cc", "-o", os.path.join(d, "esc"), src], check=True)
+            sp.run([SANDBOX_EXEC, "-p", _PROFILE.format(d=os.path.realpath(d)), os.path.join(d, "esc")])
+            guard.append((not os.path.exists(out_path), "sandbox blocks writes outside temp dir"))
+    else:
+        print("SKIP  sandbox (GRADER_SANDBOX=0 or no sandbox-exec)")
     for passed_, label in guard:
         ok &= passed_
         print(f"{'PASS' if passed_ else 'FAIL'}  guard: {label}")
