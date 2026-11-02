@@ -25,6 +25,7 @@ import tempfile
 from concurrent.futures import ThreadPoolExecutor
 
 RUN_TIMEOUT_S = 10
+GRADE_WORKERS_DEFAULT = max(1, (os.cpu_count() or 4) - 1)
 COMPILE_TIMEOUT_S = 30
 COBC = os.environ.get("COBC") or shutil.which("cobc") or "/opt/homebrew/bin/cobc"
 # macOS sandbox for the run step: no network, no writes outside the grade's temp dir.
