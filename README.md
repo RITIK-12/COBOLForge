@@ -11,23 +11,37 @@ Fine-tune a small open model on Fireworks to write correct COBOL, and measure th
 | Frozen prompt `prompt.py` | Done: `build_messages(problem["prompt"])` -> [system, user]; model answers a full program in one ```` ```cobol ```` block | Ritik |
 | MBPP -> COBOLEval converter `data/convert_mbpp.py` | Done: 459 problems, 1,371 tests | Ritik |
 | Teacher rejection sampling `data/sample_teacher.py` | Done (`kimi-k3`): 709 SFT rows | Ritik |
-| SFT | Managed LoRA SFT on Nemotron (see below) | Ritik |
-| Baselines / eval / stats | `eval/`, `results/` | KJ |
+| SFT | **Running**: serverless LoRA SFT on **Qwen 3.8 27B**, thinking off. Details, IDs, W&B link: [sft/RUN.md](sft/RUN.md) | Ritik |
+| Baselines / eval / stats | `eval/`, `results/`; **re-run baselines on Qwen 3.8 27B** (see eval contract) | KJ |
 
-### Fireworks facts checked on the live catalog (2026-11-02)
+### Student switched to Qwen 3.8 27B (2026-11-02)
 
-For `accounts/fireworks/models/nemotron-lightning-3p5-30b-a3b`:
+We need SFT **and** GRPO. Checked against the live catalog, the Serverless Training docs and the cookbook:
 
-- `supervisedLoraTunable: true` -> **Managed LoRA SFT works.**
-- `rlLoraTunable: false`, `rlTunable: false`, `supportsServerlessTraining: false` -> **no GRPO / RL and no
-  Serverless Training API on this student.** Post-training after SFT = expert iteration (another round of
-  rejection-sampled SFT from the SFT model's own passing samples). `qwen3p8-27b` has `rlLoraTunable: true`
-  if RL on a different student is ever needed (would need new baselines).
-- `supportsServerlessLora: false` -> the tuned LoRA can't run on serverless inference; evaluating it
-  needs an **on-demand deployment**. Evaluate the base model on that same deployment too, so base and
-  tuned go through the same serving path.
-- `kimi-k3` (teacher) rejects `n > 1`; one request per sample. It returns reasoning in
-  `reasoning_content`, so `content` is just the answer.
+| Model | SFT | GRPO | Serverless Training | Serverless inference (base) |
+| --- | --- | --- | --- | --- |
+| Nemotron Lightning 3.5 30B A3B | managed only | no (`rlLoraTunable`/`rlTunable` false) | no | yes |
+| **Qwen 3.8 27B** (`qwen3p8-27b`) | yes | yes | yes | no (404) -> sample in-session |
+| Muse Glimmer 30B | yes | yes | yes | no (deprecated 2026-09-25) |
+
+Qwen 3.8 27B also leads Muse and Nemotron on every coding/reasoning benchmark their model cards share.
+Teacher data and `prompt.py` are student-independent, so nothing upstream changes.
+
+### Eval contract (base vs tuned)
+
+- Serverless Training sampler for **both** systems, renderer `qwen3_8_disable_thinking_interleaved`
+  (thinking off; training targets are code only), temperature 0, max_tokens 4096, `prompt.build_messages`.
+- Base = fresh LoRA client on `accounts/fireworks/models/qwen3p8-27b`, `save_weights_for_sampler` before any step.
+- Tuned = load this run's final training checkpoint (`create_training_client_from_state`, refs in
+  [sft/RUN.md](sft/RUN.md)), then `save_weights_for_sampler`. The final weights are also promoted to a model.
+- Optional context row: base with thinking on (shows the gain isn't from a weakened baseline).
+
+### Other Fireworks facts (2026-11-02)
+
+- `kimi-k3` (teacher) rejects `n > 1` and caps generated tokens at 72k/min (429 + `Retry-After`).
+  It returns reasoning in `reasoning_content`, so `content` is just the answer.
+- No fine-tuned LoRA runs on serverless inference (`supportsServerlessLora: false` everywhere); use
+  in-session sampling or an on-demand deployment.
 
 ## Setup (macOS, Apple Silicon)
 
@@ -37,7 +51,16 @@ uv venv .venv --python /opt/homebrew/bin/python3.11
 uv pip install --python .venv/bin/python httpx numpy python-dotenv "fireworks-ai>=1.2.30,<2"
 export FIREWORKS_API_KEY=...                  # see .env.example
 .venv/bin/python -m grader.grade --self-test  # grade.py needs Python >= 3.10
+
+# training: separate venv with the fw-ai cookbook's dependencies (torch, transformers, wandb, ...)
+uv venv .venv-train --python /opt/homebrew/bin/python3.11
+uv pip install --python .venv-train/bin/python -r <cookbook>/training/pyproject.toml deps
+.venv-train/bin/python -m sft.train_serverless check   # renders every row, exact tokens, no API calls
+.venv-train/bin/python -m sft.train_serverless train --output-model-id cobol-sft-qwen38-<stamp>
 ```
+
+`sft/train_serverless.py` finds the cookbook at `~/.claude/plugins/cache/fw-ai-cookbook/fireworks-training/2.3.0`
+(override with `FW_COOKBOOK`). W&B logs to the logged-in account's default entity (override `WANDB_ENTITY`).
 
 ## Run order
 
