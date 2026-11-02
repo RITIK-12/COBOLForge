@@ -1,0 +1,26 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. HAS-CLOSE-ELEMENTS.
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       01 I PIC 9(4).
+       01 J PIC 9(4).
+       01 D COMP-2.
+       LINKAGE SECTION.
+       01 LINKED-ITEMS.
+           05 L-NUMBERS OCCURS 5 TIMES INDEXED BY NI COMP-2.
+           05 L-THRESHOLD COMP-2.
+           05 RESULT PIC 9.
+       PROCEDURE DIVISION USING LINKED-ITEMS.
+           MOVE 0 TO RESULT
+           PERFORM VARYING I FROM 1 BY 1 UNTIL I > 5
+             PERFORM VARYING J FROM 1 BY 1 UNTIL J > 5
+               IF I NOT = J
+                 COMPUTE D = FUNCTION ABS(L-NUMBERS(I) - L-NUMBERS(J))
+                 IF D < L-THRESHOLD
+                   MOVE 1 TO RESULT
+                 END-IF
+               END-IF
+             END-PERFORM
+           END-PERFORM
+           GOBACK.
+       END PROGRAM HAS-CLOSE-ELEMENTS.
