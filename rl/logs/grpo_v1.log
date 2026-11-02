@@ -1,0 +1,65 @@
+GRPO grpo-v1: 36 steps x 8 groups x 8 rollouts, lr 2e-05, init ritik-7xa24uxitcg9/run-94dffbdc3914486d9d362a614f824d0c/step-90
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+{
+ "minutes": 38.8,
+ "rollouts": 2536,
+ "mean_reward": 0.429,
+ "pass_rate": 0.366,
+ "completion_tokens": 1093093,
+ "est_cost_usd_upper": 17.71
+}
+{
+ "steps": 37,
+ "accepted_groups": 294,
+ "resolved_rows": 317,
+ "training_session": "accounts/ritik-7xa24uxitcg9/trainingSessions/ts-574f897a25104afab310d9910ff316e8",
+ "training_run": "accounts/ritik-7xa24uxitcg9/trainingRuns/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0",
+ "final_sampler_snapshot": "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-step-37-021e4346",
+ "periodic_training_checkpoints": [
+  "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-5",
+  "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-10",
+  "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-15",
+  "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-20",
+  "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-25",
+  "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-30",
+  "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-35"
+ ],
+ "final_training_checkpoint": "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-37"
+}

@@ -1,0 +1,17 @@
+{
+ "base_model": "accounts/fireworks/models/qwen3p8-27b",
+ "learning_rate": 2e-05,
+ "completions_per_prompt": 8,
+ "prompt_groups_per_step": 8,
+ "max_completion_tokens": 4096,
+ "temperature": 1.0,
+ "max_rows": 317,
+ "lora_rank": 16,
+ "lora_alpha": 32,
+ "init_from_checkpoint": "ritik-7xa24uxitcg9/run-94dffbdc3914486d9d362a614f824d0c/step-90",
+ "dcp_save_interval": 5,
+ "renderer": "qwen3_8_disable_thinking_interleaved",
+ "reward": "1.0 pass / 0.2 compiles / 0",
+ "steps": 36,
+ "pool_size": 331
+}

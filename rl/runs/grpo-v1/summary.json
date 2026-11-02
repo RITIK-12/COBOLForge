@@ -1,0 +1,8 @@
+{
+ "minutes": 38.8,
+ "rollouts": 2536,
+ "mean_reward": 0.429,
+ "pass_rate": 0.366,
+ "completion_tokens": 1093093,
+ "est_cost_usd_upper": 17.71
+}

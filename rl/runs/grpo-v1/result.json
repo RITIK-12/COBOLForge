@@ -1,0 +1,18 @@
+{
+ "steps": 37,
+ "accepted_groups": 294,
+ "resolved_rows": 317,
+ "training_session": "accounts/ritik-7xa24uxitcg9/trainingSessions/ts-574f897a25104afab310d9910ff316e8",
+ "training_run": "accounts/ritik-7xa24uxitcg9/trainingRuns/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0",
+ "final_sampler_snapshot": "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-step-37-021e4346",
+ "periodic_training_checkpoints": [
+  "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-5",
+  "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-10",
+  "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-15",
+  "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-20",
+  "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-25",
+  "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-30",
+  "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-35"
+ ],
+ "final_training_checkpoint": "ritik-7xa24uxitcg9/run-c5e685bf48e04d4ebd3ea3c90bf4ebc0/grpo-v1-state-step-37"
+}
