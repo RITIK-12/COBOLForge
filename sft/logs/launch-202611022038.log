@@ -1,0 +1,272 @@
+{
+ "log_path": "/Users/ritik/Documents/FireWorksHack/COBOLForge/sft/logs/20261102-203901",
+ "base_model": "accounts/fireworks/models/qwen3p8-27b",
+ "renderer": "qwen3_8_disable_thinking_interleaved",
+ "max_seq_len": 4096,
+ "wandb": "visualaiblog/cobolforge/qwen38-sft-20261102-203901",
+ "lora_rank": 16,
+ "lora_alpha": 32,
+ "learning_rate": 0.0001,
+ "epochs": 2,
+ "batch_size": 16,
+ "warmup_steps": 5,
+ "grad_clip_norm": 1.0,
+ "seed": 0
+}
+wandb: [wandb.login()] Loaded credentials for https://api.forge.coreweave.com from WANDB_API_KEY.
+wandb: Currently logged in as: ai_ritik (visualaiblog) to https://api.forge.coreweave.com. Use `wandb login --relogin` to force relogin
+wandb: WARNING Changes to your `wandb` environment variables will be ignored because your `wandb` session has already started. For more information on how to modify your settings with `wandb.init()` arguments, please refer to https://wandb.me/wandb-init.
+wandb: setting up run 58xcqtcd
+wandb: Tracking run with wandb version 0.31.0
+wandb: Run data is saved locally in /Users/ritik/Documents/FireWorksHack/COBOLForge/wandb/run-20261102_123903-58xcqtcd
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run qwen38-sft-20261102-203901
+wandb: ⭐️ View project at https://forge.coreweave.com/wandb/visualaiblog/cobolforge
+wandb: 🚀 View run at https://forge.coreweave.com/wandb/visualaiblog/cobolforge/runs/58xcqtcd
+2026-11-02 12:39:04,691 INFO WandB: https://forge.coreweave.com/wandb/visualaiblog/cobolforge/runs/58xcqtcd
+2026-11-02 12:39:05,669 INFO ServiceClient initialized for session ts-b0aaaacfcf6a4661a9e617a5063a65ad
+2026-11-02 12:39:06,493 INFO Created model run-94dffbdc3914486d9d362a614f824d0c:train:0 (lora_rank=16)
+2026-11-02 12:39:06,837 INFO Auto-resolved account ID: ritik-7xa24uxitcg9
+2026-11-02 12:39:06,838 INFO FiretitanTrainingClient session_id: 3c990e18
+2026-11-02 12:39:07,225 INFO Auto-resolved account ID: ritik-7xa24uxitcg9
+2026-11-02 12:39:07,225 INFO Serverless training session ts-b0aaaacfcf6a4661a9e617a5063a65ad, run run-94dffbdc3914486d9d362a614f824d0c. To continue from one of this run's checkpoints in a new process, pass init_from_checkpoint='ritik-7xa24uxitcg9/run-94dffbdc3914486d9d362a614f824d0c/<checkpoint>' with the same log_path.
+2026-11-02 12:39:10,399 INFO Auto-selected 4 render workers: cpu=8 (quota=0 affinity=0 host=8) max=16 tasks=709 cgroup=0.0/0.0 GiB host_available=0.0/0.0 GiB base=8.0 GiB reserve=8.0 GiB per_worker=10.0 GiB
+2026-11-02 12:39:10,400 INFO Dataset: 709 examples from /Users/ritik/Documents/FireWorksHack/COBOLForge/sft/logs/20261102-203901/train_messages.jsonl (renderer=qwen3_8_disable_thinking_interleaved, train_on_what=all_assistant_messages, workers=4, seed=0) -> ~45 batches/epoch x 2 epochs
+2026-11-02 12:39:11,428 INFO Starting at step 0 from base model (no checkpoint)
+2026-11-02 12:39:33,825 INFO Step 1/89 | Loss: 0.1325 | PPL: 1.14 | tok/s: 553 | tokens: 12333 | depth: 4
+{"type": "metrics", "step": 1, "ce_loss": 0.13250200313126614, "ppl": 1.1416813030244082, "tokens_per_sec": 553.2803939747224, "lr": 2e-05}
+2026-11-02 12:39:36,571 INFO Step 2/89 | Loss: 0.1602 | PPL: 1.17 | tok/s: 994 | tokens: 12556 | depth: 4
+{"type": "metrics", "step": 2, "ce_loss": 0.1602415152464976, "ppl": 1.1737943259870591, "tokens_per_sec": 994.0821151263518, "lr": 4e-05}
+2026-11-02 12:39:39,249 INFO Step 3/89 | Loss: 0.1397 | PPL: 1.15 | tok/s: 1346 | tokens: 12429 | depth: 4
+{"type": "metrics", "step": 3, "ce_loss": 0.1396779442114064, "ppl": 1.1499034061685938, "tokens_per_sec": 1346.4910276549285, "lr": 6e-05}
+2026-11-02 12:39:42,325 INFO Step 4/89 | Loss: 0.1217 | PPL: 1.13 | tok/s: 1625 | tokens: 12705 | depth: 4
+{"type": "metrics", "step": 4, "ce_loss": 0.12167909732017154, "ppl": 1.1293916188254967, "tokens_per_sec": 1624.5677112592928, "lr": 8e-05}
+2026-11-02 12:39:45,086 INFO Step 5/89 | Loss: 0.1189 | PPL: 1.13 | tok/s: 1849 | tokens: 12001 | depth: 4
+{"type": "metrics", "step": 5, "ce_loss": 0.11894313007883234, "ppl": 1.1263058635413057, "tokens_per_sec": 1848.5863557985706, "lr": 0.0001}
+2026-11-02 12:39:48,096 INFO Step 6/89 | Loss: 0.1267 | PPL: 1.14 | tok/s: 2069 | tokens: 13619 | depth: 4
+{"type": "metrics", "step": 6, "ce_loss": 0.1266560462279858, "ppl": 1.1350265539700113, "tokens_per_sec": 2068.880598787634, "lr": 0.0001}
+2026-11-02 12:39:50,894 INFO Step 7/89 | Loss: 0.0975 | PPL: 1.10 | tok/s: 2210 | tokens: 11338 | depth: 4
+{"type": "metrics", "step": 7, "ce_loss": 0.09750053498355696, "ppl": 1.1024120313354782, "tokens_per_sec": 2209.8680365448845, "lr": 0.0001}
+2026-11-02 12:39:53,957 INFO Step 8/89 | Loss: 0.1177 | PPL: 1.12 | tok/s: 2352 | tokens: 12783 | depth: 4
+{"type": "metrics", "step": 8, "ce_loss": 0.11768992839630966, "ppl": 1.1248952592085566, "tokens_per_sec": 2351.6377890841154, "lr": 0.0001}
+2026-11-02 12:39:56,918 INFO Step 9/89 | Loss: 0.1063 | PPL: 1.11 | tok/s: 2467 | tokens: 12211 | depth: 4
+{"type": "metrics", "step": 9, "ce_loss": 0.10634987004178792, "ppl": 1.1122109377293894, "tokens_per_sec": 2467.245890329439, "lr": 0.0001}
+2026-11-02 12:39:59,890 INFO Step 10/89 | Loss: 0.1181 | PPL: 1.13 | tok/s: 2599 | tokens: 13700 | depth: 4
+{"type": "metrics", "step": 10, "ce_loss": 0.11805122368619542, "ppl": 1.1253017519948663, "tokens_per_sec": 2599.108067439842, "lr": 0.0001}
+2026-11-02 12:40:02,707 INFO Step 11/89 | Loss: 0.1165 | PPL: 1.12 | tok/s: 2707 | tokens: 12852 | depth: 4
+{"type": "metrics", "step": 11, "ce_loss": 0.1165148498745996, "ppl": 1.1235741952792233, "tokens_per_sec": 2707.0104752395678, "lr": 0.0001}
+2026-11-02 12:40:05,787 INFO Step 12/89 | Loss: 0.1103 | PPL: 1.12 | tok/s: 2810 | tokens: 13930 | depth: 4
+{"type": "metrics", "step": 12, "ce_loss": 0.11034961700885194, "ppl": 1.1166684084893435, "tokens_per_sec": 2810.088986837576, "lr": 0.0001}
+2026-11-02 12:40:08,552 INFO Step 13/89 | Loss: 0.0983 | PPL: 1.10 | tok/s: 2909 | tokens: 13400 | depth: 4
+{"type": "metrics", "step": 13, "ce_loss": 0.098260467327955, "ppl": 1.1032501082955057, "tokens_per_sec": 2908.8285496258995, "lr": 0.0001}
+2026-11-02 12:40:11,624 INFO Step 14/89 | Loss: 0.0906 | PPL: 1.09 | tok/s: 2966 | tokens: 12380 | depth: 4
+{"type": "metrics", "step": 14, "ce_loss": 0.09060973762335517, "ppl": 1.0948416463698796, "tokens_per_sec": 2966.1629240911666, "lr": 0.0001}
+2026-11-02 12:40:14,438 INFO Step 15/89 | Loss: 0.0854 | PPL: 1.09 | tok/s: 3023 | tokens: 11953 | depth: 4
+{"type": "metrics", "step": 15, "ce_loss": 0.08535680914171952, "ppl": 1.0891056002125754, "tokens_per_sec": 3023.4993849677894, "lr": 0.0001}
+2026-11-02 12:40:17,377 INFO Step 16/89 | Loss: 0.0849 | PPL: 1.09 | tok/s: 3073 | tokens: 12146 | depth: 4
+{"type": "metrics", "step": 16, "ce_loss": 0.08490872718826284, "ppl": 1.0886177009652989, "tokens_per_sec": 3072.9817121386595, "lr": 0.0001}
+2026-11-02 12:40:20,520 INFO Step 17/89 | Loss: 0.0812 | PPL: 1.08 | tok/s: 3113 | tokens: 12445 | depth: 4
+{"type": "metrics", "step": 17, "ce_loss": 0.08118915694622764, "ppl": 1.0845760322549416, "tokens_per_sec": 3113.3836237175947, "lr": 0.0001}
+2026-11-02 12:40:23,431 INFO Step 18/89 | Loss: 0.0807 | PPL: 1.08 | tok/s: 3167 | tokens: 12934 | depth: 4
+{"type": "metrics", "step": 18, "ce_loss": 0.08066702848122444, "ppl": 1.0840098920478614, "tokens_per_sec": 3167.2083634606174, "lr": 0.0001}
+2026-11-02 12:40:26,336 INFO Step 19/89 | Loss: 0.0739 | PPL: 1.08 | tok/s: 3201 | tokens: 11722 | depth: 4
+{"type": "metrics", "step": 19, "ce_loss": 0.07385648227422027, "ppl": 1.076652275721537, "tokens_per_sec": 3200.9397114860967, "lr": 0.0001}
+2026-11-02 12:40:29,483 INFO Saving intermediate checkpoint at step 20 (dcp=True, sampler=False)
+2026-11-02 12:40:29,485 INFO Saving DCP checkpoint 'step-20'...
+2026-11-02 12:40:34,260 INFO DCP checkpoint 'step-20' saved (4.8s)
+2026-11-02 12:40:51,568 INFO Step 20/89 | Loss: 0.1112 | PPL: 1.12 | tok/s: 3249 | tokens: 13842 | depth: 4
+{"type": "metrics", "step": 20, "ce_loss": 0.11124177121580486, "ppl": 1.117665093439976, "tokens_per_sec": 3249.2664815036223, "lr": 0.0001}
+2026-11-02 12:40:54,646 INFO Step 21/89 | Loss: 0.1056 | PPL: 1.11 | tok/s: 2578 | tokens: 12556 | depth: 4
+{"type": "metrics", "step": 21, "ce_loss": 0.10558296173963476, "ppl": 1.111358300916414, "tokens_per_sec": 2578.1038392799046, "lr": 0.0001}
+2026-11-02 12:40:56,802 INFO Step 22/89 | Loss: 0.0954 | PPL: 1.10 | tok/s: 2648 | tokens: 12961 | depth: 4
+{"type": "metrics", "step": 22, "ce_loss": 0.09536963222343439, "ppl": 1.1000653996050835, "tokens_per_sec": 2648.4328025962577, "lr": 0.0001}
+2026-11-02 12:41:00,467 INFO Step 23/89 | Loss: 0.1050 | PPL: 1.11 | tok/s: 2683 | tokens: 13489 | depth: 4
+{"type": "metrics", "step": 23, "ce_loss": 0.1049558628769163, "ppl": 1.1106615878666493, "tokens_per_sec": 2683.1636126521985, "lr": 0.0001}
+2026-11-02 12:41:00,973 INFO Step 24/89 | Loss: 0.0804 | PPL: 1.08 | tok/s: 2780 | tokens: 11969 | depth: 4
+{"type": "metrics", "step": 24, "ce_loss": 0.08039688526642029, "ppl": 1.0837170936812708, "tokens_per_sec": 2780.1217280632095, "lr": 0.0001}
+2026-11-02 12:41:02,827 INFO Step 25/89 | Loss: 0.0990 | PPL: 1.10 | tok/s: 2847 | tokens: 12628 | depth: 4
+{"type": "metrics", "step": 25, "ce_loss": 0.09899946832012366, "ppl": 1.1040657125492044, "tokens_per_sec": 2847.268572244146, "lr": 0.0001}
+2026-11-02 12:41:04,661 INFO Step 26/89 | Loss: 0.1067 | PPL: 1.11 | tok/s: 2920 | tokens: 13495 | depth: 4
+{"type": "metrics", "step": 26, "ce_loss": 0.1066806110824993, "ppl": 1.1125788523713065, "tokens_per_sec": 2920.405098712552, "lr": 0.0001}
+2026-11-02 12:41:06,649 INFO Step 27/89 | Loss: 0.1161 | PPL: 1.12 | tok/s: 2980 | tokens: 12682 | depth: 4
+{"type": "metrics", "step": 27, "ce_loss": 0.11609212561368486, "ppl": 1.1230993335827921, "tokens_per_sec": 2980.1518494655597, "lr": 0.0001}
+2026-11-02 12:41:08,794 INFO Step 28/89 | Loss: 0.0893 | PPL: 1.09 | tok/s: 3037 | tokens: 13019 | depth: 4
+{"type": "metrics", "step": 28, "ce_loss": 0.08934309345783914, "ppl": 1.0934557494907322, "tokens_per_sec": 3036.645384979454, "lr": 0.0001}
+2026-11-02 12:41:10,508 INFO Step 29/89 | Loss: 0.0698 | PPL: 1.07 | tok/s: 3095 | tokens: 12088 | depth: 4
+{"type": "metrics", "step": 29, "ce_loss": 0.0697614193911468, "ppl": 1.0722523321208675, "tokens_per_sec": 3094.5041189796298, "lr": 0.0001}
+2026-11-02 12:41:12,459 INFO Step 30/89 | Loss: 0.0721 | PPL: 1.07 | tok/s: 3149 | tokens: 12683 | depth: 4
+{"type": "metrics", "step": 30, "ce_loss": 0.07206204510926324, "ppl": 1.0747220232405934, "tokens_per_sec": 3149.4492078460275, "lr": 0.0001}
+2026-11-02 12:41:14,488 INFO Step 31/89 | Loss: 0.0759 | PPL: 1.08 | tok/s: 3200 | tokens: 12566 | depth: 4
+{"type": "metrics", "step": 31, "ce_loss": 0.07589144253044042, "ppl": 1.078845451067892, "tokens_per_sec": 3199.6772430488327, "lr": 0.0001}
+2026-11-02 12:41:16,333 INFO Step 32/89 | Loss: 0.1056 | PPL: 1.11 | tok/s: 3256 | tokens: 12910 | depth: 4
+{"type": "metrics", "step": 32, "ce_loss": 0.10563127376767502, "ppl": 1.1114119941868157, "tokens_per_sec": 3255.831918104819, "lr": 0.0001}
+2026-11-02 12:41:18,307 INFO Step 33/89 | Loss: 0.0657 | PPL: 1.07 | tok/s: 3302 | tokens: 12223 | depth: 4
+{"type": "metrics", "step": 33, "ce_loss": 0.06571459602967959, "ppl": 1.0679218845220044, "tokens_per_sec": 3301.5532385906795, "lr": 0.0001}
+2026-11-02 12:41:20,248 INFO Step 34/89 | Loss: 0.1021 | PPL: 1.11 | tok/s: 3349 | tokens: 12460 | depth: 4
+{"type": "metrics", "step": 34, "ce_loss": 0.10210804207500022, "ppl": 1.107503122199566, "tokens_per_sec": 3348.562090121132, "lr": 0.0001}
+2026-11-02 12:41:22,181 INFO Step 35/89 | Loss: 0.0835 | PPL: 1.09 | tok/s: 3400 | tokens: 13154 | depth: 4
+{"type": "metrics", "step": 35, "ce_loss": 0.08354058863981483, "ppl": 1.0871293394985937, "tokens_per_sec": 3399.6896492571727, "lr": 0.0001}
+2026-11-02 12:41:25,672 INFO Step 36/89 | Loss: 0.0827 | PPL: 1.09 | tok/s: 3410 | tokens: 13317 | depth: 4
+{"type": "metrics", "step": 36, "ce_loss": 0.0826687960667933, "ppl": 1.0861820012157444, "tokens_per_sec": 3410.488563998231, "lr": 0.0001}
+2026-11-02 12:41:26,905 INFO Step 37/89 | Loss: 0.0792 | PPL: 1.08 | tok/s: 3477 | tokens: 13261 | depth: 4
+{"type": "metrics", "step": 37, "ce_loss": 0.07919820896726065, "ppl": 1.0824188459309314, "tokens_per_sec": 3477.3820538976934, "lr": 0.0001}
+2026-11-02 12:41:28,158 INFO Step 38/89 | Loss: 0.0769 | PPL: 1.08 | tok/s: 3536 | tokens: 12297 | depth: 4
+{"type": "metrics", "step": 38, "ce_loss": 0.07688954919629519, "ppl": 1.079922791464907, "tokens_per_sec": 3535.5145320291704, "lr": 0.0001}
+2026-11-02 12:41:30,270 INFO Step 39/89 | Loss: 0.0945 | PPL: 1.10 | tok/s: 3573 | tokens: 12717 | depth: 4
+{"type": "metrics", "step": 39, "ce_loss": 0.09450128494980982, "ppl": 1.0991105754340076, "tokens_per_sec": 3573.354268239098, "lr": 0.0001}
+2026-11-02 12:41:32,111 INFO Saving intermediate checkpoint at step 40 (dcp=True, sampler=False)
+2026-11-02 12:41:32,114 INFO Saving DCP checkpoint 'step-40'...
+2026-11-02 12:41:34,562 INFO DCP checkpoint 'step-40' saved (2.5s)
+2026-11-02 12:41:52,727 INFO Step 40/89 | Loss: 0.0807 | PPL: 1.08 | tok/s: 3614 | tokens: 12241 | depth: 4
+{"type": "metrics", "step": 40, "ce_loss": 0.08071940136292717, "ppl": 1.0840666662564036, "tokens_per_sec": 3613.636151834091, "lr": 0.0001}
+2026-11-02 12:41:55,978 INFO Step 41/89 | Loss: 0.0822 | PPL: 1.09 | tok/s: 3169 | tokens: 13141 | depth: 4
+{"type": "metrics", "step": 41, "ce_loss": 0.08222836242984498, "ppl": 1.08570371546086, "tokens_per_sec": 3169.070688894305, "lr": 0.0001}
+2026-11-02 12:41:58,357 INFO Step 42/89 | Loss: 0.0938 | PPL: 1.10 | tok/s: 3206 | tokens: 13768 | depth: 4
+{"type": "metrics", "step": 42, "ce_loss": 0.09379727835017361, "ppl": 1.0983370666447658, "tokens_per_sec": 3206.4157453443177, "lr": 0.0001}
+2026-11-02 12:42:00,663 INFO Step 43/89 | Loss: 0.1005 | PPL: 1.11 | tok/s: 3238 | tokens: 12729 | depth: 4
+{"type": "metrics", "step": 43, "ce_loss": 0.10050038745231485, "ppl": 1.1057240701193451, "tokens_per_sec": 3237.9486984708483, "lr": 0.0001}
+2026-11-02 12:42:01,948 INFO Step 44/89 | Loss: 0.0838 | PPL: 1.09 | tok/s: 3289 | tokens: 12831 | depth: 4
+{"type": "metrics", "step": 44, "ce_loss": 0.08379109411479056, "ppl": 1.0874017054633032, "tokens_per_sec": 3288.837039280986, "lr": 0.0001}
+2026-11-02 12:42:03,348 INFO Step 45/89 | Loss: 0.0793 | PPL: 1.08 | tok/s: 3288 | tokens: 4384 | depth: 4
+{"type": "metrics", "step": 45, "ce_loss": 0.079305840197773, "ppl": 1.0825353542731044, "tokens_per_sec": 3287.549793154312, "lr": 0.0001}
+2026-11-02 12:42:08,152 INFO Step 46/89 | Loss: 0.0766 | PPL: 1.08 | tok/s: 3270 | tokens: 12625 | depth: 4
+{"type": "metrics", "step": 46, "ce_loss": 0.07661600640628508, "ppl": 1.0796274267708172, "tokens_per_sec": 3269.6077474894673, "lr": 0.0001}
+2026-11-02 12:42:09,891 INFO Step 47/89 | Loss: 0.0786 | PPL: 1.08 | tok/s: 3313 | tokens: 13438 | depth: 4
+{"type": "metrics", "step": 47, "ce_loss": 0.07864851637953522, "ppl": 1.0818240118174385, "tokens_per_sec": 3313.0728893143855, "lr": 0.0001}
+2026-11-02 12:42:11,936 INFO Step 48/89 | Loss: 0.0744 | PPL: 1.08 | tok/s: 3352 | tokens: 13773 | depth: 4
+{"type": "metrics", "step": 48, "ce_loss": 0.07436217893925154, "ppl": 1.0771968728756443, "tokens_per_sec": 3351.8528808938777, "lr": 0.0001}
+2026-11-02 12:42:13,804 INFO Step 49/89 | Loss: 0.0590 | PPL: 1.06 | tok/s: 3384 | tokens: 12084 | depth: 4
+{"type": "metrics", "step": 49, "ce_loss": 0.05899279270628503, "ppl": 1.0607675954489844, "tokens_per_sec": 3383.7996836256098, "lr": 0.0001}
+2026-11-02 12:42:16,008 INFO Step 50/89 | Loss: 0.0578 | PPL: 1.06 | tok/s: 3409 | tokens: 12081 | depth: 4
+{"type": "metrics", "step": 50, "ce_loss": 0.05777759260207049, "ppl": 1.0594793334630297, "tokens_per_sec": 3408.8620775393765, "lr": 0.0001}
+2026-11-02 12:42:18,195 INFO Step 51/89 | Loss: 0.0668 | PPL: 1.07 | tok/s: 3430 | tokens: 11414 | depth: 4
+{"type": "metrics", "step": 51, "ce_loss": 0.06677758426688003, "ppl": 1.0690576764832993, "tokens_per_sec": 3430.068572081938, "lr": 0.0001}
+2026-11-02 12:42:20,663 INFO Step 52/89 | Loss: 0.0610 | PPL: 1.06 | tok/s: 3449 | tokens: 12045 | depth: 4
+{"type": "metrics", "step": 52, "ce_loss": 0.0610461891760336, "ppl": 1.0629480097460815, "tokens_per_sec": 3449.006454266044, "lr": 0.0001}
+2026-11-02 12:42:22,194 INFO Step 53/89 | Loss: 0.0811 | PPL: 1.08 | tok/s: 3487 | tokens: 12479 | depth: 4
+{"type": "metrics", "step": 53, "ce_loss": 0.08106744332456753, "ppl": 1.0844440326113303, "tokens_per_sec": 3486.752756198035, "lr": 0.0001}
+2026-11-02 12:42:23,910 INFO Step 54/89 | Loss: 0.0883 | PPL: 1.09 | tok/s: 3525 | tokens: 13304 | depth: 4
+{"type": "metrics", "step": 54, "ce_loss": 0.08826884090673859, "ppl": 1.0922817325705652, "tokens_per_sec": 3524.820359208806, "lr": 0.0001}
+2026-11-02 12:42:25,776 INFO Step 55/89 | Loss: 0.0629 | PPL: 1.06 | tok/s: 3550 | tokens: 11563 | depth: 4
+{"type": "metrics", "step": 55, "ce_loss": 0.06290114704126921, "ppl": 1.0649215633806202, "tokens_per_sec": 3550.485129843365, "lr": 0.0001}
+2026-11-02 12:42:27,746 INFO Step 56/89 | Loss: 0.0566 | PPL: 1.06 | tok/s: 3575 | tokens: 11824 | depth: 4
+{"type": "metrics", "step": 56, "ce_loss": 0.05657051869478168, "ppl": 1.058201235139049, "tokens_per_sec": 3575.0923681499744, "lr": 0.0001}
+2026-11-02 12:42:29,671 INFO Step 57/89 | Loss: 0.0522 | PPL: 1.05 | tok/s: 3598 | tokens: 11421 | depth: 4
+{"type": "metrics", "step": 57, "ce_loss": 0.052152513364350866, "ppl": 1.0535364086433356, "tokens_per_sec": 3597.996594342163, "lr": 0.0001}
+2026-11-02 12:42:31,713 INFO Step 58/89 | Loss: 0.0700 | PPL: 1.07 | tok/s: 3626 | tokens: 12944 | depth: 4
+{"type": "metrics", "step": 58, "ce_loss": 0.06999159255564208, "ppl": 1.0724991642392643, "tokens_per_sec": 3625.955883166532, "lr": 0.0001}
+2026-11-02 12:42:34,145 INFO Step 59/89 | Loss: 0.0743 | PPL: 1.08 | tok/s: 3649 | tokens: 13467 | depth: 4
+{"type": "metrics", "step": 59, "ce_loss": 0.07431618479256254, "ppl": 1.0771473292640272, "tokens_per_sec": 3648.9090071150567, "lr": 0.0001}
+2026-11-02 12:42:35,896 INFO Saving intermediate checkpoint at step 60 (dcp=True, sampler=False)
+2026-11-02 12:42:35,899 INFO Saving DCP checkpoint 'step-60'...
+2026-11-02 12:42:38,327 INFO DCP checkpoint 'step-60' saved (2.4s)
+2026-11-02 12:42:55,669 INFO Step 60/89 | Loss: 0.0711 | PPL: 1.07 | tok/s: 3678 | tokens: 12319 | depth: 4
+{"type": "metrics", "step": 60, "ce_loss": 0.07108553754658199, "ppl": 1.0736730613001073, "tokens_per_sec": 3677.9197879888234, "lr": 0.0001}
+2026-11-02 12:42:58,952 INFO Step 61/89 | Loss: 0.0709 | PPL: 1.07 | tok/s: 3363 | tokens: 13260 | depth: 4
+{"type": "metrics", "step": 61, "ce_loss": 0.07090153792227584, "ppl": 1.0734755240341491, "tokens_per_sec": 3363.354049126129, "lr": 0.0001}
+2026-11-02 12:43:01,106 INFO Step 62/89 | Loss: 0.0858 | PPL: 1.09 | tok/s: 3395 | tokens: 14439 | depth: 4
+{"type": "metrics", "step": 62, "ce_loss": 0.08575519335768646, "ppl": 1.0895395691306653, "tokens_per_sec": 3394.694452176009, "lr": 0.0001}
+2026-11-02 12:43:03,043 INFO Step 63/89 | Loss: 0.0631 | PPL: 1.07 | tok/s: 3421 | tokens: 12564 | depth: 4
+{"type": "metrics", "step": 63, "ce_loss": 0.06312568495933303, "ppl": 1.0651607054985948, "tokens_per_sec": 3420.565428253005, "lr": 0.0001}
+2026-11-02 12:43:05,810 INFO Step 64/89 | Loss: 0.0655 | PPL: 1.07 | tok/s: 3433 | tokens: 12423 | depth: 4
+{"type": "metrics", "step": 64, "ce_loss": 0.06554499994752205, "ppl": 1.0677407845116995, "tokens_per_sec": 3433.194621118385, "lr": 0.0001}
+2026-11-02 12:43:06,730 INFO Step 65/89 | Loss: 0.0570 | PPL: 1.06 | tok/s: 3469 | tokens: 11633 | depth: 4
+{"type": "metrics", "step": 65, "ce_loss": 0.05701016281470882, "ppl": 1.0586665693730122, "tokens_per_sec": 3469.218248809509, "lr": 0.0001}
+2026-11-02 12:43:08,604 INFO Step 66/89 | Loss: 0.0584 | PPL: 1.06 | tok/s: 3494 | tokens: 12267 | depth: 4
+{"type": "metrics", "step": 66, "ce_loss": 0.05839636537924073, "ppl": 1.060135113300983, "tokens_per_sec": 3493.54441560757, "lr": 0.0001}
+2026-11-02 12:43:10,949 INFO Step 67/89 | Loss: 0.0711 | PPL: 1.07 | tok/s: 3516 | tokens: 13457 | depth: 4
+{"type": "metrics", "step": 67, "ce_loss": 0.07106319102551155, "ppl": 1.0736490687104967, "tokens_per_sec": 3515.5265188333565, "lr": 0.0001}
+2026-11-02 12:43:12,568 INFO Step 68/89 | Loss: 0.0496 | PPL: 1.05 | tok/s: 3545 | tokens: 12788 | depth: 4
+{"type": "metrics", "step": 68, "ce_loss": 0.04958866233732101, "ppl": 1.0508387579050427, "tokens_per_sec": 3544.964687428897, "lr": 0.0001}
+2026-11-02 12:43:14,691 INFO Step 69/89 | Loss: 0.0637 | PPL: 1.07 | tok/s: 3565 | tokens: 12481 | depth: 4
+{"type": "metrics", "step": 69, "ce_loss": 0.06365876896502157, "ppl": 1.0657286770089975, "tokens_per_sec": 3565.3438847309753, "lr": 0.0001}
+2026-11-02 12:43:16,548 INFO Step 70/89 | Loss: 0.0546 | PPL: 1.06 | tok/s: 3589 | tokens: 12389 | depth: 4
+{"type": "metrics", "step": 70, "ce_loss": 0.05461946935600377, "ppl": 1.0561386450807086, "tokens_per_sec": 3588.8853779985516, "lr": 0.0001}
+2026-11-02 12:43:18,637 INFO Step 71/89 | Loss: 0.0841 | PPL: 1.09 | tok/s: 3611 | tokens: 12979 | depth: 4
+{"type": "metrics", "step": 71, "ce_loss": 0.08405117825892604, "ppl": 1.0876845581863597, "tokens_per_sec": 3611.0759490485525, "lr": 0.0001}
+2026-11-02 12:43:20,839 INFO Step 72/89 | Loss: 0.0921 | PPL: 1.10 | tok/s: 3636 | tokens: 14182 | depth: 4
+{"type": "metrics", "step": 72, "ce_loss": 0.09205068476030226, "ppl": 1.0964203924773022, "tokens_per_sec": 3636.0708368902606, "lr": 0.0001}
+2026-11-02 12:43:22,728 INFO Step 73/89 | Loss: 0.0710 | PPL: 1.07 | tok/s: 3662 | tokens: 13378 | depth: 4
+{"type": "metrics", "step": 73, "ce_loss": 0.07098938810886182, "ppl": 1.0735698332017094, "tokens_per_sec": 3661.9831310836353, "lr": 0.0001}
+2026-11-02 12:43:24,565 INFO Step 74/89 | Loss: 0.0564 | PPL: 1.06 | tok/s: 3684 | tokens: 12316 | depth: 4
+{"type": "metrics", "step": 74, "ce_loss": 0.05643964117037417, "ppl": 1.0580627494435992, "tokens_per_sec": 3684.068168403063, "lr": 0.0001}
+2026-11-02 12:43:26,670 INFO Step 75/89 | Loss: 0.0785 | PPL: 1.08 | tok/s: 3703 | tokens: 12597 | depth: 4
+{"type": "metrics", "step": 75, "ce_loss": 0.07853682145155466, "ppl": 1.0817031843103864, "tokens_per_sec": 3703.043216953229, "lr": 0.0001}
+2026-11-02 12:43:28,547 INFO Step 76/89 | Loss: 0.0823 | PPL: 1.09 | tok/s: 3730 | tokens: 13819 | depth: 4
+{"type": "metrics", "step": 76, "ce_loss": 0.08225338009917314, "ppl": 1.0857308775771666, "tokens_per_sec": 3729.7759098384713, "lr": 0.0001}
+2026-11-02 12:43:30,669 INFO Step 77/89 | Loss: 0.0707 | PPL: 1.07 | tok/s: 3749 | tokens: 13004 | depth: 4
+{"type": "metrics", "step": 77, "ce_loss": 0.07069627431219466, "ppl": 1.0732552011856573, "tokens_per_sec": 3749.4057543228832, "lr": 0.0001}
+2026-11-02 12:43:32,523 INFO Step 78/89 | Loss: 0.0626 | PPL: 1.06 | tok/s: 3772 | tokens: 12731 | depth: 4
+{"type": "metrics", "step": 78, "ce_loss": 0.06255729285089455, "ppl": 1.0645554485872917, "tokens_per_sec": 3771.5543443492775, "lr": 0.0001}
+2026-11-02 12:43:34,596 INFO Step 79/89 | Loss: 0.0889 | PPL: 1.09 | tok/s: 3793 | tokens: 13523 | depth: 4
+{"type": "metrics", "step": 79, "ce_loss": 0.08889178864642756, "ppl": 1.092962378988536, "tokens_per_sec": 3793.2368564611584, "lr": 0.0001}
+2026-11-02 12:43:36,436 INFO Saving intermediate checkpoint at step 80 (dcp=True, sampler=False)
+2026-11-02 12:43:36,439 INFO Saving DCP checkpoint 'step-80'...
+2026-11-02 12:43:38,938 INFO DCP checkpoint 'step-80' saved (2.5s)
+2026-11-02 12:43:57,008 INFO Step 80/89 | Loss: 0.0733 | PPL: 1.08 | tok/s: 3814 | tokens: 12373 | depth: 4
+{"type": "metrics", "step": 80, "ce_loss": 0.07326649319280203, "ppl": 1.076017249981924, "tokens_per_sec": 3813.602409463819, "lr": 0.0001}
+2026-11-02 12:44:00,161 INFO Step 81/89 | Loss: 0.0655 | PPL: 1.07 | tok/s: 3544 | tokens: 12668 | depth: 4
+{"type": "metrics", "step": 81, "ce_loss": 0.06554108421153793, "ppl": 1.0677366035288736, "tokens_per_sec": 3544.0088188489285, "lr": 0.0001}
+2026-11-02 12:44:02,040 INFO Step 82/89 | Loss: 0.0658 | PPL: 1.07 | tok/s: 3562 | tokens: 11913 | depth: 4
+{"type": "metrics", "step": 82, "ce_loss": 0.06583517921689226, "ppl": 1.0680506657108013, "tokens_per_sec": 3562.102120009181, "lr": 0.0001}
+2026-11-02 12:44:04,181 INFO Step 83/89 | Loss: 0.0673 | PPL: 1.07 | tok/s: 3580 | tokens: 12810 | depth: 4
+{"type": "metrics", "step": 83, "ce_loss": 0.06726953178530155, "ppl": 1.0695837261380965, "tokens_per_sec": 3579.8176026113233, "lr": 0.0001}
+2026-11-02 12:44:06,019 INFO Step 84/89 | Loss: 0.0578 | PPL: 1.06 | tok/s: 3600 | tokens: 12646 | depth: 4
+{"type": "metrics", "step": 84, "ce_loss": 0.05780954845165529, "ppl": 1.0595131905662114, "tokens_per_sec": 3600.4178982229582, "lr": 0.0001}
+2026-11-02 12:44:08,906 INFO Step 85/89 | Loss: 0.0693 | PPL: 1.07 | tok/s: 3608 | tokens: 12644 | depth: 4
+{"type": "metrics", "step": 85, "ce_loss": 0.06930165143273063, "ppl": 1.071759458167729, "tokens_per_sec": 3607.9741390834256, "lr": 0.0001}
+2026-11-02 12:44:10,824 INFO Step 86/89 | Loss: 0.0683 | PPL: 1.07 | tok/s: 3635 | tokens: 15052 | depth: 4
+{"type": "metrics", "step": 86, "ce_loss": 0.06828603320564784, "ppl": 1.0706715122893138, "tokens_per_sec": 3635.1487020630957, "lr": 0.0001}
+2026-11-02 12:44:12,189 INFO Step 87/89 | Loss: 0.0689 | PPL: 1.07 | tok/s: 3659 | tokens: 12105 | depth: 4
+{"type": "metrics", "step": 87, "ce_loss": 0.06886969435284712, "ppl": 1.0712966040555936, "tokens_per_sec": 3658.90995253628, "lr": 0.0001}
+2026-11-02 12:44:14,235 INFO Step 88/89 | Loss: 0.0579 | PPL: 1.06 | tok/s: 3678 | tokens: 13128 | depth: 4
+{"type": "metrics", "step": 88, "ce_loss": 0.05794581533701752, "ppl": 1.0596575769660093, "tokens_per_sec": 3677.550257113772, "lr": 0.0001}
+2026-11-02 12:44:15,861 INFO Step 89/89 | Loss: 0.0597 | PPL: 1.06 | tok/s: 3700 | tokens: 12794 | depth: 4
+{"type": "metrics", "step": 89, "ce_loss": 0.05968097156277093, "ppl": 1.0614978445219838, "tokens_per_sec": 3699.9299970502734, "lr": 0.0001}
+2026-11-02 12:44:17,588 INFO Step 90/89 | Loss: 0.0623 | PPL: 1.06 | tok/s: 3691 | tokens: 3704 | depth: 4
+{"type": "metrics", "step": 90, "ce_loss": 0.06234934430187181, "ppl": 1.0643340988418806, "tokens_per_sec": 3691.159821349704, "lr": 0.0001}
+2026-11-02 12:44:17,589 INFO Saving final checkpoint (step 90)...
+2026-11-02 12:44:17,589 INFO Saving DCP checkpoint 'step-90'...
+2026-11-02 12:44:20,373 INFO DCP checkpoint 'step-90' saved (2.8s)
+2026-11-02 12:44:38,834 INFO Saving sampler checkpoint 'step-90'...
+2026-11-02 12:44:41,615 INFO Sampler checkpoint 'step-90' saved (2.8s)
+2026-11-02 12:44:42,675 INFO Sampler server-stored name 'run-94dffbdc3914486d9d362a614f824d0c-step-90-3c990e18' differs from caller name 'step-90'; using control-plane row for subsequent promotion.
+2026-11-02 12:44:43,772 INFO Promoting newest promotable checkpoint: run-94dffbdc3914486d9d362a614f824d0c-step-90-3c990e18 -> cobol-sft-qwen38-202611022038
+2026-11-02 12:44:43,773 INFO Promoting session checkpoint 'accounts/ritik-7xa24uxitcg9/trainingSessions/ts-b0aaaacfcf6a4661a9e617a5063a65ad/checkpoints/run-94dffbdc3914486d9d362a614f824d0c-step-90-3c990e18' -> model 'accounts/ritik-7xa24uxitcg9/models/cobol-sft-qwen38-202611022038'
+2026-11-02 12:45:05,604 INFO Promoted! Model state=READY, kind=HF_PEFT_ADDON
+2026-11-02 12:45:05,605 INFO PEFT: base=accounts/fireworks/models/qwen3p8-27b, r=16, targets=['down_proj', 'gate_proj', 'in_proj_a', 'in_proj_b', 'in_proj_qkv', 'in_proj_z', 'k_proj', 'o_proj', 'out_proj', 'q_proj', 'up_proj', 'v_proj']
+2026-11-02 12:45:05,605 INFO Training complete: 90 optimizer steps
+wandb: updating run metadata
+wandb: uploading output.log
+wandb: 
+wandb: Run history:
+wandb: perf/checkpoint_save_time █▄▁▃
+wandb:         perf/fwd_bwd_time ▂▂▂▂▂▂▂▂▂▂▁▁▁▁▂▁▂▁▁▂▁▂▂▂▁▁▁▂█▁▁▁▁▂▁▂▁▂▁▁
+wandb:      perf/optim_step_time ▁▁▁▁▁█▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:             train/ce_loss █▇▇▆▆▄▄▄▃▄▅▄▂▃▃▄▃▃▅▄▁▂▃▄▂▁▂▂▄▂▁▂▁▃▃▂▃▂▁▂
+wandb:           train/grad_norm ▅▄▃█▄▄▄▃▂▃▂▂▃▄▃▃▃▃▂▃▃▂▂▂▂▂▃▂▃▂▅▄▂▂▂▂▂▂▂▁
+wandb: train/grad_norm_post_clip ▆▆▅█▅▅▅▃▅▃▃▅▃▃▄▃▃▃▅▂▄▄▁▂▅▃▆▂▆▃▃▃▄▃▁▂▃▃▃▅
+wandb:  train/grad_norm_pre_norm ▅▅▄▃█▄▃▄▃▃▃▂▃▃▂▂▂▃▃▄▂▂▂▃▂▃▂▂▃▂▅▂▄▃▂▂▃▄▂▁
+wandb:       train/grad_norm_rms █▇▆▇▆▅▅▅▆▄▄▄▃▃▆▇▃▃▆▄▃▄▃▃▃▄▆▃▂▃▃▃█▂▄▄▃▆▆▁
+wandb:                train/loss █▅▆▅▄▄▃▃▂▄▄▄▅▂▂▂▃▂▃▄▃▂▁▁▂▁▂▂▁▁▃▁▃▂▁▂▂▂▂▁
+wandb:                  train/lr ▁▃██████████████████████████████████████
+wandb:                        +4 ...
+wandb: 
+wandb: Run summary:
+wandb: perf/checkpoint_save_time 20.57171
+wandb:         perf/fwd_bwd_time 1.72656
+wandb:      perf/optim_step_time 0.0
+wandb:             train/ce_loss 0.06235
+wandb:           train/grad_norm 1.21875
+wandb: train/grad_norm_post_clip 1.0
+wandb:  train/grad_norm_pre_norm 1.21875
+wandb:       train/grad_norm_rms 4e-05
+wandb:                train/loss 0.06235
+wandb:                  train/lr 0.0001
+wandb:                        +4 ...
+wandb: 
+wandb: 🚀 View run qwen38-sft-20261102-203901 at: https://forge.coreweave.com/wandb/visualaiblog/cobolforge/runs/58xcqtcd
+wandb: ⭐️ View project at: https://forge.coreweave.com/wandb/visualaiblog/cobolforge
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20261102_123903-58xcqtcd/logs
+{'steps': 90, 'job_id': 'ts-b0aaaacfcf6a4661a9e617a5063a65ad'}

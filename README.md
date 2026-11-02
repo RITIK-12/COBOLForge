@@ -11,7 +11,7 @@ Fine-tune a small open model on Fireworks to write correct COBOL, and measure th
 | Frozen prompt `prompt.py` | Done: `build_messages(problem["prompt"])` -> [system, user]; model answers a full program in one ```` ```cobol ```` block | Ritik |
 | MBPP -> COBOLEval converter `data/convert_mbpp.py` | Done: 459 problems, 1,371 tests | Ritik |
 | Teacher rejection sampling `data/sample_teacher.py` | Done (`kimi-k3`): 709 SFT rows | Ritik |
-| SFT | **Running**: serverless LoRA SFT on **Qwen 3.8 27B**, thinking off. Details, IDs, W&B link: [sft/RUN.md](sft/RUN.md) | Ritik |
+| SFT | **Done**: serverless LoRA SFT on **Qwen 3.8 27B** (thinking off), 90 steps, loss 0.135 -> 0.062; model `cobol-sft-qwen38-202611022038`. Details, checkpoints, W&B: [sft/RUN.md](sft/RUN.md) | Ritik |
 | Baselines / eval / stats | `eval/`, `results/`; **re-run baselines on Qwen 3.8 27B** (see eval contract) | KJ |
 
 ### Student switched to Qwen 3.8 27B (2026-11-02)
