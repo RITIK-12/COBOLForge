@@ -65,7 +65,7 @@ def main():
     ap.add_argument("--run-name", required=True)
     ap.add_argument("--groups-per-step", type=int, default=8)
     ap.add_argument("--rollouts", type=int, default=8, help="completions per prompt (group size)")
-    ap.add_argument("--lr", type=float, default=1e-5)
+    ap.add_argument("--lr", type=float, default=2e-5)
     ap.add_argument("--temperature", type=float, default=1.0)
     ap.add_argument("--max-tokens", type=int, default=4096)
     ap.add_argument("--dcp-every", type=int, default=5)
@@ -79,9 +79,11 @@ def main():
     problems = load_problems()
     pool = [json.loads(l)["task_id"] for l in (ROOT / "rl/pool.jsonl").open()]
     random.Random(0).shuffle(pool)
-    n_rows = a.steps * a.groups_per_step
-    if n_rows > len(pool):
-        raise SystemExit(f"{a.steps} steps x {a.groups_per_step} groups needs {n_rows} rows; pool has {len(pool)}")
+    # +10% rows: zero-variance groups are dropped and refilled from the remaining rows (smoke: 1 in 9)
+    n_rows = min(len(pool), int(a.steps * a.groups_per_step * 1.1) + 1)
+    if n_rows < a.steps * a.groups_per_step:
+        raise SystemExit(f"{a.steps} steps x {a.groups_per_step} groups needs {a.steps * a.groups_per_step} rows; "
+                         f"pool has {len(pool)}")
     rows = [{"task_id": t, "messages": build_messages(problems[t]["prompt"])} for t in pool[:n_rows]]
 
     run_dir = ROOT / "rl/runs" / a.run_name
@@ -107,10 +109,12 @@ def main():
 
     t0 = time.time()
     try:
-        result = asyncio.run(recipe.main(
+        result = recipe.main(
             cfg, rollout_fn_factory=make_rollout_fn_factory(problems),
             dynamic_filter_fn=has_reward_variance, rows=rows,
-        ))
+        )
+        if asyncio.iscoroutine(result):  # recipe.main is sync in fireworks-training 2.3.0
+            result = asyncio.run(result)
     finally:
         rs = STATS["rewards"]
         # cost upper bound: every prompt prefilled uncached; train tokens = prompt + completion

@@ -1,0 +1,26 @@
+GRPO smoke: 2 steps x 8 groups x 8 rollouts, lr 1e-05, init ritik-7xa24uxitcg9/run-94dffbdc3914486d9d362a614f824d0c/step-90
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+{
+ "minutes": 2.0,
+ "rollouts": 128,
+ "mean_reward": 0.37,
+ "pass_rate": 0.312,
+ "completion_tokens": 65633,
+ "est_cost_usd_upper": 1.0
+}
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/Users/kj/Desktop/COBOLforge/COBOLForge/rl/grpo.py", line 131, in <module>
+    main()
+  File "/Users/kj/Desktop/COBOLforge/COBOLForge/rl/grpo.py", line 110, in main
+    result = asyncio.run(recipe.main(
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/runners.py", line 194, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/asyncio/runners.py", line 89, in run
+    raise ValueError("a coroutine was expected, got {!r}".format(coro))
+ValueError: a coroutine was expected, got {'steps': 2, 'accepted_groups': 15, 'resolved_rows': 16, 'training_session': 'accounts/ritik-7xa24uxitcg9/trainingSessions/ts-066a7025448746a4a1435e4541a7e220', 'training_run': 'accounts/ritik-7xa24uxitcg9/trainingRuns/run-4d09e1e0fdcf4c9ca85225f0099760dc', 'final_sampler_snapshot': 'ritik-7xa24uxitcg9/run-4d09e1e0fdcf4c9ca85225f0099760dc/smoke-step-2-f960a646', 'periodic_training_checkpoints': [], 'final_training_checkpoint': 'ritik-7xa24uxitcg9/run-4d09e1e0fdcf4c9ca85225f0099760dc/smoke-state-step-2'}
