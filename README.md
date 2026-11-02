@@ -3,6 +3,31 @@
 Fine-tune a small open model on Fireworks to write correct COBOL, and measure the gain on
 **COBOLEval** (146 problems, 821 tests; held out, never trained on). Plan: [PLAN.md](PLAN.md).
 
+## Results: COBOLEval, Qwen 3.8 27B base vs SFT
+
+Same model, same prompt (`prompt.py`), same sampler (Serverless Training session), thinking off,
+temperature 0, max_tokens 4096, one sample per problem. Graded by `grader/grade.py` (COBOLEval harness).
+
+| System | pass@1 | Compiles | Sampling cost (146 problems) | p50 latency |
+| --- | --- | --- | --- | --- |
+| Qwen 3.8 27B base | 19/146 (13.0%) | 32.9% | $0.74 | 3.9s |
+| **Qwen 3.8 27B + SFT** | **75/146 (51.4%)** | **78.1%** | $0.60 | 6.0s |
+
+- **Gain: +38.4 points**, 95% bootstrap CI over problems [+29.5, +46.6] (5,000 resamples).
+- **McNemar exact**: SFT-only passes 59, base-only passes 3, p = 1.7e-14.
+- Failure breakdown, base -> SFT: compile errors 97 -> 32, wrong answers 29 -> 39, blocked 1 -> 0.
+- **Contamination check**: MBPP and HumanEval share a few tasks (gcd, largest prime factor). Excluding
+  every COBOLEval problem whose description has word-Jaccard >= 0.3 with any training problem (13 dropped),
+  the gain is +34.6 points (12.8% -> 47.4%, n=133, CI [+25.6, +43.6], p = 1e-11); at >= 0.25 (22 dropped)
+  it is +32.3 points (p = 5e-10).
+- Caveats: one training run, one seed, n=146; HumanEval/74 and /160 can't pass for any system (broken
+  dataset callers); base evaluated with thinking off (same mode as SFT; a thinking-on base row is not run yet);
+  costs are upper bounds (prefill billed as uncached).
+
+Per-problem rows: `results/qwen38-27b-{base,sft}.jsonl`; raw model outputs: `eval/cache/`; stats:
+`results/compare_qwen38-27b-base_vs_qwen38-27b-sft.json` (`eval/compare.py`). Reproduce with
+`.venv-train/bin/python -m eval.run_insession` then `.venv/bin/python -m eval.compare qwen38-27b-base qwen38-27b-sft`.
+
 ## Status (team sync)
 
 | Piece | State | Owner |
@@ -12,7 +37,8 @@ Fine-tune a small open model on Fireworks to write correct COBOL, and measure th
 | MBPP -> COBOLEval converter `data/convert_mbpp.py` | Done: 459 problems, 1,371 tests | Ritik |
 | Teacher rejection sampling `data/sample_teacher.py` | Done (`kimi-k3`): 709 SFT rows | Ritik |
 | SFT | **Done**: serverless LoRA SFT on **Qwen 3.8 27B** (thinking off), 90 steps, loss 0.135 -> 0.062; model `cobol-sft-qwen38-202611022038`. Details, checkpoints, W&B: [sft/RUN.md](sft/RUN.md) | Ritik |
-| Baselines / eval / stats | `eval/`, `results/`; **re-run baselines on Qwen 3.8 27B** (see eval contract) | KJ |
+| Eval base vs SFT | **Done** (results above): `eval/run_insession.py`, `eval/compare.py` | Ritik |
+| GRPO / expert iteration, frontier context rows, charts | Next; GRPO can start from SFT checkpoint `step-90` ([sft/RUN.md](sft/RUN.md)) | KJ |
 
 ### Student switched to Qwen 3.8 27B (2026-11-02)
 

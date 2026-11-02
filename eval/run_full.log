@@ -1,0 +1,17 @@
+[qwen38-27b-base] 143 to run (3 already in results)
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+[qwen38-27b-base] 25/143
+[qwen38-27b-base] 50/143
+[qwen38-27b-base] 75/143
+[qwen38-27b-base] 100/143
+[qwen38-27b-base] 125/143
+[qwen38-27b-base] pass@1 19/146, compiled 48/146, cost $0.74
+[qwen38-27b-sft] 143 to run (3 already in results)
+[qwen38-27b-sft] loaded ritik-7xa24uxitcg9/run-94dffbdc3914486d9d362a614f824d0c/step-90 -> sampler ritik-7xa24uxitcg9/run-2a4f8d8cf79e4e37900d1a8c3dcd039e/cobol-eval-47ec579d
+prefill_queue_duration is unavailable; AdaptiveConcurrencyController is using HTTP 429/503 and transport-error congestion signals instead
+[qwen38-27b-sft] 25/143
+[qwen38-27b-sft] 50/143
+[qwen38-27b-sft] 75/143
+[qwen38-27b-sft] 100/143
+[qwen38-27b-sft] 125/143
+[qwen38-27b-sft] pass@1 75/146, compiled 114/146, cost $0.60
