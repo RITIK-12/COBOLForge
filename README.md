@@ -72,7 +72,8 @@ Then every caller is compiled against a stub solution; problems whose callers fa
 | --- | --- |
 | MBPP rows | 974 |
 | Converted + callers compile | 459 problems, 1,371 tests |
-| Teacher samples / passing / `train.jsonl` rows | _filled in when sampling finishes_ |
+| Teacher (`kimi-k3`, T=0.7) samples: compiled / passed | 709: 645 / 559 (interim; round 1 still running) |
+| `train.jsonl` | **552 rows from 317 problems** (≤ 2 per problem) |
 
 `train.jsonl` rows are `{id, messages: [system, user, assistant]}` with system + user from
 `prompt.py` and assistant = the passing program in one ```` ```cobol ```` block, at most 2 distinct

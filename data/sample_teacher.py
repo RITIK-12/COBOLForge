@@ -79,6 +79,7 @@ async def main():
     ap.add_argument("--temperature", type=float, default=0.7)
     ap.add_argument("--max-tokens", type=int, default=8192)
     ap.add_argument("--limit", type=int, default=0)
+    ap.add_argument("--cache-only", action="store_true", help="grade cached responses only; no API calls")
     args = ap.parse_args()
 
     problems = [json.loads(l) for l in open(os.path.join(ROOT, "data/mbpp_cobol.jsonl"))]
@@ -98,7 +99,8 @@ async def main():
 
     todo = [(p, k) for p in problems for k in range(args.samples)
             if (p["task_id"], k) not in graded
-            and not (args.only_unsolved and n_passed(p["task_id"]) >= args.keep)]
+            and not (args.only_unsolved and n_passed(p["task_id"]) >= args.keep)
+            and not (args.cache_only and not os.path.exists(cache_path(args.model, p["task_id"], k)))]
     print(f"{len(problems)} problems, {len(todo)} samples to fetch+grade (model {args.model})")
 
     sem = asyncio.Semaphore(args.concurrency)
