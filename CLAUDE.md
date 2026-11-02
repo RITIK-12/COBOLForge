@@ -3,7 +3,8 @@
 ## Goal
 Fine-tune a small open model on Fireworks to write correct COBOL. Show a statistically
 significant gain on COBOLEval (146 problems, 821 tests) vs the same base model.
-Frontier models (Claude, GPT) are optional context, not the required baseline.
+Everything runs on Fireworks only (no OpenRouter). Context baselines are 1–2 of the largest
+open models on Fireworks, not Claude/GPT; the required baseline is the same base model.
 
 ## Stack
 - Student: Nemotron Lightning 3.5 30B on Fireworks (fallback: Qwen3.8 27B)
@@ -31,6 +32,6 @@ KJ owns: grader/, eval/, rl/, results/ stats. Teammate owns: data/, sft/, README
 - Async with bounded concurrency (semaphore ~16); retries with backoff on 429/5xx.
 - Do not invent Fireworks model IDs or API params — check Fireworks docs or `firectl` output.
 - Do not guess COBOLEval's harness format — read the repo's source and follow it exactly.
-- Secrets only from env (`FIREWORKS_API_KEY`, `OPENROUTER_API_KEY`); keep `.env.example` updated.
+- Secrets only from env (`FIREWORKS_API_KEY`); keep `.env.example` updated.
 - Small, frequent commits to main. Prefer working code now over clean code later.
 - Stats: McNemar on per-problem pass; bootstrap resampling PROBLEMS (not tests), 5,000 iters, 95% CI.

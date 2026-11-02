@@ -10,11 +10,12 @@ Repo: RITIK-12/COBOLForge · Team: KJ (RL / post-training) + Ritik (SFT)
 A small open model, fine-tuned on Fireworks, that writes correct COBOL.
 Banks, insurers and governments still run on COBOL, the people who write it are retiring,
 and general models are weak at it. We show a statistically significant gain on a published,
-held-out COBOL benchmark at a fraction of frontier cost and latency.
+held-out COBOL benchmark at a fraction of the cost and latency of the largest open models.
 
 **Headline claim:** "Base 30B goes from X% to Y% pass@1 on COBOLEval (McNemar p, bootstrap 95% CI),
-at $Z per problem vs $W for frontier models."
-Beating frontier models on correctness is a bonus slide, not the claim.
+at $Z per problem vs $W for the largest open models on Fireworks."
+Beating the largest open models on correctness is a bonus slide, not the claim.
+Everything (student, teacher, comparison models, training) runs on Fireworks; no OpenRouter.
 
 ---
 
@@ -45,7 +46,7 @@ Beating frontier models on correctness is a bonus slide, not the claim.
 | Student + SFT | Main result | **Yes** |
 | Student + SFT + GRPO (or expert iteration) | Post-training result | If time allows |
 | Teacher (strongest open coder on Fireworks) | Context, data source | Yes (cheap) |
-| One Claude + one GPT model via OpenRouter | Frontier context | Optional |
+| 1–2 of the largest open models on Fireworks (serverless) | Large-model context | Optional |
 
 All systems: same `prompt.py`, temperature 0, max_tokens 4096. No weakened baselines.
 
@@ -128,7 +129,7 @@ Called "preference optimization with verifier labels", not RLHF.
 - `eval/run.py`: async, bounded concurrency (~16), retries with backoff, caches every row,
   skips ids already in `results/{system}.jsonl`.
 - Row format: `{id, system, pass, compiled, tokens, latency_s, cost}`.
-- **McNemar** on per-problem pass/fail (fine-tune vs base; GRPO vs SFT; vs frontier).
+- **McNemar** on per-problem pass/fail (fine-tune vs base; GRPO vs SFT; vs largest open models).
 - **Bootstrap:** resample problems (not tests — tests within a problem are clustered), 5,000 iterations, 95% CI.
 - Call a gain real only when both agree. ~10+ point gain needed for significance at n=146.
 - Report every result, including losses and non-significant runs.
@@ -151,7 +152,7 @@ Called "preference optimization with verifier labels", not RLHF.
 | `results/{system}.jsonl` | One row per problem (format above) | Both |
 
 Repo layout: `grader/ data/ sft/ rl/ eval/ results/ charts/`. Each person works in their own folders,
-small commits, push to main often. Secrets only from env (`FIREWORKS_API_KEY`, `OPENROUTER_API_KEY`).
+small commits, push to main often. Secrets only from env (`FIREWORKS_API_KEY`).
 
 ---
 
@@ -161,7 +162,7 @@ small commits, push to main often. Secrets only from env (`FIREWORKS_API_KEY`, `
 | --- | --- | --- | --- |
 | 11:21–11:45 | Native grader, `grade.py`, self-test; Fireworks setup; base + teacher on 30 problems | Confirm student trainable; filter + convert MBPP | |
 | **11:45** | | | **Sync 1:** go/no-go, pick teacher, freeze prompt |
-| 11:45–12:45 | Full 146 baselines (base, teacher, frontier); `stats.py` | Rejection sampling, dedupe, `train.jsonl`, **launch SFT** | |
+| 11:45–12:45 | Full 146 baselines (base, teacher, largest open model); `stats.py` | Rejection sampling, dedupe, `train.jsonl`, **launch SFT** | |
 | **12:45** | | | **Sync 2:** data yield, baseline numbers, SFT job ID |
 | 12:45–2:00 | GRPO loop + reward; 2-step smoke test | Monitor SFT; backup data (expert iteration, DPO pairs); README skeleton; charts; video clip of base failing | |
 | **~2:00** | | | **Sync 3:** SFT checkpoint. Not ready by 2:15 → skip GRPO, run expert iteration |
@@ -180,7 +181,7 @@ small commits, push to main often. Secrets only from env (`FIREWORKS_API_KEY`, `
 | Nemotron not trainable on our account | Switch to Qwen3.8 27B at Sync 1 |
 | Base student > ~50% on 30-problem check | Expect a small gain; lean on cost/latency story |
 | Teacher ≤ base student | Sample from the student instead |
-| Frontier > 70% on 30 problems | Pitch is "same quality at a fraction of cost and latency" |
+| Largest open model > 70% on 30 problems | Pitch is "same quality at a fraction of cost and latency" |
 | < 300 verified examples at 12:45 | Train on what we have; don't extend the data phase |
 | SFT not evaluated by 2:15 | Expert iteration instead of GRPO |
 | GRPO not converging by 2:45 | Stop, report it as tried, use SFT as the final model |
@@ -210,7 +211,7 @@ small commits, push to main often. Secrets only from env (`FIREWORKS_API_KEY`, `
 - [ ] `results/` saved per system so judges can read without rerunning
 - [ ] Charts: leaderboard, McNemar, bootstrap, failure breakdown
 - [ ] Video under 60s: problem → base model fails to compile → fine-tune passes → significance chart → number + one caveat
-- [ ] `.env.example` with `FIREWORKS_API_KEY`, `OPENROUTER_API_KEY`; dependencies pinned (`uv.lock`)
+- [ ] `.env.example` with `FIREWORKS_API_KEY`; dependencies pinned (`uv.lock`)
 - [ ] Disclosure: AI coding assistants used (Claude Code)
 
 ---
@@ -220,7 +221,7 @@ small commits, push to main often. Secrets only from env (`FIREWORKS_API_KEY`, `
 | Criterion | Weight | What we show | Honest caveat |
 | --- | --- | --- | --- |
 | Benchmark evaluation | 40% | Same model before/after on 146 held-out problems; McNemar + problem-level bootstrap; all runs reported | One training run, one seed; n=146 |
-| Business value | 25% | Legacy COBOL in banking, insurance, government; cost and latency vs frontier | Algorithmic tasks, not enterprise COBOL (file I/O, copybooks, CICS) |
+| Business value | 25% | Legacy COBOL in banking, insurance, government; cost and latency vs the largest open models | Algorithmic tasks, not enterprise COBOL (file I/O, copybooks, CICS) |
 | Technical execution | 20% | Verified rejection-sampled data, SFT + RLVR on a sandboxed execution reward | No hyperparameter sweep |
 | Presentation & demo | 10% | Compile-fail → pass demo; significance charts | |
 | Documentation | 5% | README with run order, cached results, pinned deps | |
