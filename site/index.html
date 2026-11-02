@@ -197,7 +197,7 @@
 <section class="scene" id="grpo">
   <div class="node">08</div>
   <div class="card glass">
-    <h2>Next: GRPO, with the compiler as coach</h2>
+    <h2>GRPO: the compiler as coach</h2>
     <p class="cap">The SFT model writes 8 programs per problem. Each is graded, and attempts that beat their group's average are reinforced.</p>
     <div class="flow">
       <div class="step glass"><b>Problem</b><small>{{pool}} MBPP problems SFT solves sometimes</small></div>
@@ -213,11 +213,11 @@
     <p class="loopback">↺ <em>new problems</em> → next step</p>
     <div class="stats">
       <div class="stat glass"><b>{{pool}} / 459</b><span>problems with a learning signal</span></div>
-      <div class="stat glass"><b>{{smoke_r0}} → {{smoke_r1}}</b><span>mean reward, 2-step smoke test</span></div>
-      <div class="stat glass"><b>${{smoke_cost}}</b><span>per step · 64 rollouts</span></div>
+      <div class="stat glass">{{grpo_t2}}</div>
+      <div class="stat glass">{{grpo_t3}}</div>
       <div class="stat glass">{{grpo_status}}</div>
     </div>
-    <figure class="chart glass wide" id="grpo-fig" hidden><div id="reward" class="line"></div><figcaption>Mean rollout reward per GRPO step</figcaption></figure>
+    <figure class="chart glass wide" id="grpo-fig" hidden><div id="reward" class="line"></div><figcaption>Mean rollout reward per GRPO step · each step sees new problems</figcaption></figure>
   </div>
 </section>
 

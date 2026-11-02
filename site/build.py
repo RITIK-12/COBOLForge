@@ -143,10 +143,12 @@ def grpo():
         curve = [[m["step"], round(m["rollout/raw_reward"], 4)] for m in rows(path) if "rollout/raw_reward" in m]
         if curve:
             runs[name] = curve
-    smoke = os.path.join(ROOT, "rl/runs/smoke/summary.json")
+    def summary(name):
+        path = os.path.join(ROOT, f"rl/runs/{name}/summary.json")
+        return json.load(open(path)) if name and os.path.exists(path) else None
+
     main = max((k for k in runs if k != "smoke"), key=lambda k: len(runs[k]), default=None)
-    return {"pool": len(pool), "runs": runs, "main": main,
-            "smoke": json.load(open(smoke)) if os.path.exists(smoke) else None}
+    return {"pool": len(pool), "runs": runs, "main": main, "smoke": summary("smoke"), "summary": summary(main)}
 
 
 KEYWORDS = set("""IDENTIFICATION DIVISION PROGRAM-ID ENVIRONMENT INPUT-OUTPUT SECTION DATA WORKING-STORAGE
@@ -253,14 +255,25 @@ def main():
     sb, ss = stats[BASE], stats[SFT]
     loss_first = statistics.mean(v for _, v in loss[:5])
     loss_last = statistics.mean(v for _, v in loss[-10:])
+    smoke = rl["smoke"] or {}
+    smoke_curve = rl["runs"].get("smoke", [[0, 0], [0, 0]])
+    run = rl["summary"]
+    if run:  # finished GRPO run: its size and cost
+        grpo_t2 = (f"<b>{len(rl['runs'][rl['main']])} steps</b>"
+                   f"<span>{run['rollouts']:,} rollouts · {run['minutes']:.0f} min</span>")
+        grpo_t3 = f"<b>${run['est_cost_usd_upper']:.2f}</b><span>training + rollouts (upper bound)</span>"
+    else:  # only the smoke test so far
+        grpo_t2 = (f"<b>{smoke_curve[0][1]:.2f} → {smoke_curve[-1][1]:.2f}</b>"
+                   "<span>mean reward, 2-step smoke test</span>")
+        grpo_t3 = f"<b>${smoke.get('est_cost_usd_upper', 1.0) / 2:.2f}</b><span>per step · 64 rollouts</span>"
     if grpo_files:
         gs = stats[systems[2]]
         grpo_status = (f"<b>{pct(gs['pass_rate'])}%</b><span>GRPO pass@1 ({gs['passed']}/{gs['n']}); "
                        f"{grpo_pair['diff'] * 100:+.1f} pts vs SFT, McNemar p = {grpo_pair['p']:.2g}</span>")
+    elif run:
+        grpo_status = "<b>eval next</b><span>COBOLEval score lands here on the next push</span>"
     else:
         grpo_status = "<b>running</b><span>results land here on the next push</span>"
-    smoke = rl["smoke"] or {}
-    smoke_curve = rl["runs"].get("smoke", [[0, 0], [0, 0]])
     vals = {
         "base_pct": pct(sb["pass_rate"]), "sft_pct": pct(ss["pass_rate"]),
         "base_passed": sb["passed"], "sft_passed": ss["passed"], "n": sb["n"],
@@ -274,9 +287,7 @@ def main():
         "train_rows": steps[5][1], "train_problems": n_train_problems,
         "sft_steps": loss[-1][0], "loss_first": f"{loss_first:.3f}", "loss_last": f"{loss_last:.3f}",
         "sft_tokens": f"{sft_tokens / 1e6:.2f}M", "sft_cost": f"{sft_tokens * TRAIN_RATE / 1e6:.2f}",
-        "pool": rl["pool"], "smoke_cost": f"{smoke.get('est_cost_usd_upper', 1.0) / 2:.2f}",
-        "smoke_r0": f"{smoke_curve[0][1]:.2f}", "smoke_r1": f"{smoke_curve[-1][1]:.2f}",
-        "grpo_status": grpo_status,
+        "pool": rl["pool"], "grpo_t2": grpo_t2, "grpo_t3": grpo_t3, "grpo_status": grpo_status,
         "ex_prompt": ex["prompt"], "ex_base": ex["base"], "ex_sft": ex["sft"], "ex_error": ex["error"],
         "ex_tests": ex["tests"], "ex_id": EXAMPLE,
     }
