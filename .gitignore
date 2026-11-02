@@ -5,3 +5,6 @@ __pycache__/
 grader/work/
 data/cache/
 sft/cobol-mbpp-sft-*.jsonl
+wandb/
+.venv-train/
+sft/logs/*/
