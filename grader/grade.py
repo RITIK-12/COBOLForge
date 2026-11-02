@@ -282,6 +282,13 @@ def _self_test() -> int:
         (blocked_reason("       MOVE 1 TO OPEN-COUNT CALL-IDX", p0["entry_point"]) is None, "hyphenated names allowed"),
         (blocked_reason("       DISPLAY 'CALL X' CALL \"SYSTEM\"", p0["entry_point"]) is not None, "CALL after literal blocked"),
     ]
+    from grader.construct import extract_code_block as xb
+    f = "`" * 3
+    guard += [
+        (xb(f"{f}cobol\nOLD\n{f}\n{f}cobol\nNEW\n{f}") == "NEW\n", "extract: last cobol block"),
+        (xb(f"{f}cobol\nP\n{f}\n{f}text\nout\n{f}") == "P\n", "extract: cobol beats later non-cobol"),
+        (xb(f"<think>{f}cobol\nX\n{f}</think>{f}cobol\nY\n{f}") == "Y\n", "extract: <think> dropped"),
+    ]
     if USE_SANDBOX:  # bypass the static guard to check the sandbox itself
         import subprocess as sp
         with tempfile.TemporaryDirectory() as d:

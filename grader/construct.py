@@ -1,21 +1,27 @@
 """Turn a model response into a full COBOL program, following COBOLEval scripts/generate.py.
 
-Two modes, chosen by what the model returned:
+Frozen prompt: the model returns a full COBOL program in a ```cobol block. So:
   - full program (contains IDENTIFICATION DIVISION) -> used as-is (upstream JsonProgram)
-  - completion of the prompt (WORKING-STORAGE onward) -> prompt + completion, then
-    swap_sections (upstream OpenAIChat.construct)
+  - fallback, completion of the prompt (WORKING-STORAGE onward) -> prompt + completion,
+    then swap_sections (upstream OpenAIChat.construct)
 """
 
 import re
 
-_FENCE = re.compile(r"```[^\n]*\n(.*?)(?:```|\Z)", re.S)
+_FENCE = re.compile(r"```([^\n`]*)\n(.*?)(?:```|\Z)", re.S)
 
 
 def extract_code_block(text: str) -> str:
-    """First fenced code block (upstream takes the first); falls back to the raw text."""
+    """Frozen prompt asks for one ```cobol block: take the LAST ```cobol block, else the
+    last fenced block of any language, else the raw text. <think> blocks are dropped."""
     text = re.sub(r"<think>.*?</think>", "", text or "", flags=re.S)
-    m = _FENCE.search(text)
-    return m.group(1) if m else text
+    blocks = [(lang.strip().lower(), body) for lang, body in _FENCE.findall(text)]
+    cobol = [b for lang, b in blocks if lang == "cobol"]
+    if cobol:
+        return cobol[-1]
+    if blocks:
+        return blocks[-1][1]
+    return text
 
 
 def swap_sections(src: str) -> str:
