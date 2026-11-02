@@ -8,3 +8,5 @@ sft/cobol-mbpp-sft-*.jsonl
 wandb/
 .venv-train/
 sft/logs/*/
+_site/
+.claude/launch.json

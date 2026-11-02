@@ -2,6 +2,8 @@
 
 Fine-tune a small open model on Fireworks to write correct COBOL, and measure the gain on
 **COBOLEval** (146 problems, 821 tests; held out, never trained on). Plan: [PLAN.md](PLAN.md).
+Project page: https://ritik-12.github.io/COBOLForge/ (built from this repo's results by `site/build.py`
+and `.github/workflows/pages.yml` on every push to main).
 
 ## Results: COBOLEval, Qwen 3.8 27B base vs SFT
 
