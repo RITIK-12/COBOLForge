@@ -134,44 +134,118 @@
     srTable(el, "Training data funnel", ["Stage", "Count"], f);
   }
 
-  function teacher() {
-    const el = $("#teacher");
-    bars(el, D.teacher, {
-      max: 100, fmt: (v) => v.toFixed(1) + "%", hl: (it) => it[2],
-      label: (it) => it[0] + (it[2] ? " <small>· teacher</small>" : ""),
-      tipText: (it) => `${it[0]} · ${it[1].toFixed(1)}% on 30 problems${it[2] ? " · chosen as teacher" : ""}`,
-    });
-    srTable(el, "Teacher check, pass@1 on 30 problems", ["Model", "pass@1 %"], D.teacher.map((t) => [t[0], t[1]]));
+  // ---- same harness: pass@1 vs model size, one logo per model ----
+  const pf = (p) => (p < 0.001 ? p.toExponential(1) : p.toFixed(2));
+  const SHORT = { "DeepSeek V4.1 Flash 1017": "DeepSeek V4.1 Flash" };
+  function tipFor(it) {
+    const vs = it.p == null ? "" : ` · vs SFT ${it.diff >= 0 ? "+" : ""}${it.diff.toFixed(1)} pts, p = ${pf(it.p)}` +
+      (it.fixed > it.pass && it.p_fix != null ? ` (with fix ${it.diff_fix >= 0 ? "+" : ""}${it.diff_fix.toFixed(1)}, p = ${pf(it.p_fix)})` : "");
+    return `${it.label} · ${it.size}${it.think ? ` · thinking ${it.think}` : ""} · ${it.pass.toFixed(1)}%` +
+      (it.fixed > it.pass ? ` (${it.fixed.toFixed(1)}% with section fix)` : "") + ` · $${it.cost.toFixed(4)}/problem${vs}`;
   }
-
-  // same-harness leaderboard: strict pass@1 (solid) plus the extra from COBOLEval's section-order fix (faint)
-  function harnessChart() {
-    const el = $("#harness");
+  function logoChart() {
+    const el = $("#logos");
     if (!el || !D.harness.length) return;
-    const items = [...D.harness].sort((a, b) => b.pass - a.pass);
-    legend(el, [[css("--mark"), "our fine-tune"], [css("--muted"), "strict, as base and SFT are graded"],
-      ["rgba(255,255,255,0.16)", "extra with COBOLEval's section-order fix"]]);
-    const wrap = h("div", "bars");
-    items.forEach((it, i) => {
-      const row = h("div", "row" + (it.hl ? " hl" : ""));
-      const sub = it.size + (it.think ? ` · thinking ${it.think}` : "");
-      row.innerHTML = `<span class="lab">${it.label} <small>· ${sub}</small></span><span class="track">` +
-        (it.fixed > it.pass ? `<i class="ghost" style="--w:${it.fixed}%;--d:${i * 70}ms"></i>` : "") +
-        `<i style="--w:${it.pass}%;--d:${i * 70}ms"></i></span><span class="val">${it.pass.toFixed(1)}%</span>`;
-      const pf = (p) => (p < 0.001 ? p.toExponential(1) : p.toFixed(2));
-      const vs = it.p == null ? "" : ` · vs SFT ${it.diff >= 0 ? "+" : ""}${it.diff.toFixed(1)} pts, p = ${pf(it.p)}` +
-        (it.fixed > it.pass && it.p_fix != null ? ` (with fix: ${it.diff_fix >= 0 ? "+" : ""}${it.diff_fix.toFixed(1)}, p = ${pf(it.p_fix)})` : "");
-      bind(row, `${it.label} · ${it.pass.toFixed(1)}%` + (it.fixed > it.pass ? ` (${it.fixed.toFixed(1)}% with section fix)` : "") +
-        ` · $${it.cost.toFixed(4)}/problem${vs}`);
-      wrap.appendChild(row);
+    const pts = D.harness;
+    const base = pts.find((p) => p.ours && !p.hl);
+    const tuned = pts.filter((p) => p.ours && p.hl);
+    const sft = tuned[0];
+    const short = (p) => (p.ours ? p.label.replace("Qwen 3.8 ", "") + (p.hl ? " (ours)" : "") : SHORT[p.label] || p.label);
+    let drawn = false;
+    function draw() {
+      el.querySelector("svg")?.remove();
+      const W = el.clientWidth;
+      if (!W) return;
+      const mob = W < 560, R = mob ? 13 : 17, H = mob ? 330 : 420, m = { l: 42, r: mob ? 18 : 120, t: 18, b: 34 };
+      const lx0 = Math.log10(15), lx1 = Math.log10(4000);
+      const X = (b) => m.l + ((Math.log10(b) - lx0) / (lx1 - lx0)) * (W - m.l - m.r);
+      const Y = (v) => H - m.b - (v / 100) * (H - m.t - m.b);
+      const svg = s("svg", { width: W, height: H, viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "COBOLEval pass@1 vs model size, by model" });
+      const defs = s("defs", {}, svg);
+      const mk = s("marker", { id: "arr", viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto-start-reverse" }, defs);
+      s("path", { d: "M0,0 L10,5 L0,10 z", fill: css("--mark") }, mk);
+      for (const v of [0, 25, 50, 75, 100]) {
+        s("line", { x1: m.l, x2: W - m.r, y1: Y(v), y2: Y(v), stroke: css("--grid") }, svg);
+        s("text", { x: m.l - 8, y: Y(v) + 3.5, "text-anchor": "end" }, svg).textContent = v + "%";
+      }
+      for (const [b, t] of [[27, "27B"], [100, "100B"], [300, "300B"], [1000, "1T"], [3000, "3T"]]) {
+        s("text", { x: X(b), y: H - 10, "text-anchor": "middle" }, svg).textContent = t;
+      }
+      // our SFT level, so ties read at a glance
+      s("line", { x1: m.l, x2: W - m.r, y1: Y(sft.pass), y2: Y(sft.pass), stroke: css("--mark"), "stroke-opacity": 0.4 }, svg);
+      if (!mob) s("text", { x: W - m.r + 6, y: Y(sft.pass) + 3.5, fill: css("--ember") }, svg).textContent = "our 27B";
+      // positions, nudging badges that would overlap
+      const pos = new Map();
+      [...pts].sort((a, b) => a.params - b.params || b.pass - a.pass).forEach((p) => {
+        let x = X(p.params), y = Y(p.pass);
+        for (const [, q] of pos) {
+          if (Math.abs(q.x - x) < 2 * R + 2 && Math.abs(q.y - y) < 2 * R + 2) x = q.x + 2 * R + 4;
+        }
+        pos.set(p, { x, y });
+      });
+      // section-order fix: hollow ring above the strict score
+      for (const p of pts) {
+        if (!(p.fixed > p.pass + 0.01)) continue;
+        const { x, y } = pos.get(p);
+        s("line", { x1: x, x2: x, y1: y - R, y2: Y(p.fixed) + R - 3, stroke: "rgba(255,255,255,0.3)", "stroke-width": 1.5 }, svg);
+        const ring = s("circle", { cx: x, cy: Y(p.fixed), r: R - 3, fill: "none", stroke: "rgba(255,255,255,0.55)", "stroke-width": 1.5 }, svg);
+        bind(ring, tipFor(p));
+      }
+      // base -> SFT
+      const pb = pos.get(base), ps = pos.get(sft);
+      const arrow = s("line", { x1: pb.x, x2: ps.x, y1: pb.y - R - 4, y2: ps.y + R + 4, stroke: css("--mark"), "stroke-width": 2.5, "marker-end": "url(#arr)" }, svg);
+      s("text", { x: pb.x + 10, y: (pb.y + ps.y) / 2 + 4, fill: css("--ember") }, svg).textContent = `+${(sft.pass - base.pass).toFixed(1)} pts`;
+      for (const p of pts) {
+        const { x, y } = pos.get(p);
+        const g = s("g", { class: "badge" }, svg);
+        s("circle", { cx: x, cy: y, r: R, fill: "#f6f3ea", stroke: p.hl ? css("--mark") : p.ours ? "#8a8f9c" : "rgba(255,255,255,0.25)", "stroke-width": p.hl ? 3 : 1.5 }, g);
+        const sz = R * 1.25;
+        s("image", { href: p.icon, x: x - sz / 2, y: y - sz / 2, width: sz, height: sz }, g);
+        if (!mob) {
+          // label right of the badge; left if a badge or section-fix line is in the way; below if both are
+          const LW = 7 * short(p).length + R + 8;
+          const blocked = (side) => pts.some((q) => {
+            if (q === p) return false;
+            const o = pos.get(q), dx = (o.x - x) * side;
+            const span = q.fixed > q.pass + 0.01 ? [Y(q.fixed), o.y] : [o.y - R, o.y + R];
+            return dx > 0 && dx < LW && y > span[0] - R && y < span[1] + R;
+          });
+          const [lx, ly, anchor] = !blocked(1) ? [x + R + 6, y + 3.5, "start"]
+            : !blocked(-1) ? [x - R - 6, y + 3.5, "end"] : [x, y + R + 13, "middle"];
+          s("text", { x: lx, y: ly, "text-anchor": anchor, fill: p.hl ? css("--ember") : css("--ink-dim") }, g).textContent = short(p);
+        }
+        bind(g, tipFor(p));
+      }
+      el.prepend(svg);
+      if (!drawn && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        const len = arrow.getTotalLength ? Math.hypot(ps.x - pb.x, ps.y - pb.y) : 0;
+        arrow.style.strokeDasharray = len;
+        arrow.style.strokeDashoffset = len;
+        const go = () => { arrow.style.transition = "stroke-dashoffset 1.2s cubic-bezier(.3,.6,.2,1) .3s"; arrow.style.strokeDashoffset = 0; };
+        const scene = el.closest(".scene");
+        if (scene.classList.contains("in")) requestAnimationFrame(go);
+        else scene.addEventListener("revealed", () => requestAnimationFrame(go), { once: true });
+      }
+      drawn = true;
+    }
+    draw();
+    let last = el.clientWidth;
+    new ResizeObserver(() => { if (el.clientWidth !== last) { last = el.clientWidth; draw(); } }).observe(el);
+    // legend: which logo is which model
+    const lg = h("div", "logo-legend");
+    [...pts].sort((a, b) => b.ours - a.ours || b.pass - a.pass).forEach((p) => {
+      const item = h("span", "lg" + (p.hl ? " hl" : ""),
+        `<i><img src="${p.icon}" alt=""></i><span>${p.label} <small>${p.size}${p.think ? " · thinking " + p.think : ""} · ${p.pass.toFixed(1)}%${p.fixed > p.pass + 0.01 ? ` (${p.fixed.toFixed(1)}% fixed)` : ""}</small></span>`);
+      bind(item, tipFor(p));
+      lg.appendChild(item);
     });
-    el.appendChild(wrap);
+    el.appendChild(lg);
     srTable(el, "Same-harness COBOLEval pass@1", ["Model", "Size", "pass@1 % strict", "pass@1 % with section fix", "$/problem", "p vs SFT"],
-      items.map((x) => [x.label, x.size, x.pass.toFixed(1), x.fixed.toFixed(1), x.cost.toFixed(4), x.p == null ? "" : x.p.toPrecision(2)]));
+      pts.map((x) => [x.label, x.size, x.pass.toFixed(1), x.fixed.toFixed(1), x.cost.toFixed(4), x.p == null ? "" : x.p.toPrecision(2)]));
   }
 
   function published() {
-    const el = $("#published");
+    const el = $("#published-chart");
     const items = [...D.published].sort((a, b) => b[1] - a[1]);
     bars(el, items, {
       max: 60, fmt: (v) => v.toFixed(1) + "%", hl: (it) => it[2] === "ours",
@@ -185,25 +259,27 @@
     ["compile error", "s-compile", "--crit", "✕ compile error"], ["blocked", "s-blocked", null, "⊘ blocked"]];
   function outcomes() {
     const el = $("#outcomes");
-    const used = OUT.filter(([k]) => D.systems.some((x) => x.outcomes[k]));
+    // ours first (base, SFT, GRPO), then the frontier models by pass@1
+    const rows = [...D.harness.filter((x) => x.ours), ...D.harness.filter((x) => !x.ours).sort((a, b) => b.pass - a.pass)];
+    const used = OUT.filter(([k]) => rows.some((x) => x.outcomes[k]));
     legend(el, used.map(([, , v, label]) => [v ? css(v) : "#6b6b66", label]));
-    D.systems.forEach((sys, si) => {
-      const row = h("div", "stack-row");
-      row.appendChild(h("div", "lab", `${sys.label}<small>pass@1 ${(100 * sys.pass_rate).toFixed(1)}% · compiles ${(100 * sys.compiled).toFixed(0)}%</small>`));
+    rows.forEach((sys, si) => {
+      const row = h("div", "stack-row" + (sys.ours ? " ours" : ""));
+      row.appendChild(h("div", "lab", `${sys.label}<small>pass@1 ${sys.pass.toFixed(1)}% · compiles ${(100 * sys.compiled).toFixed(0)}%</small>`));
       const st = h("div", "stack");
       used.forEach(([k, cls, , label], i) => {
         const n = sys.outcomes[k] || 0;
         if (!n) return;
         const seg = h("i", cls, n / sys.n >= 0.06 ? n : "");
         seg.style.flex = `${n} 1 0`;
-        seg.style.setProperty("--d", `${si * 150 + i * 90}ms`);
+        seg.style.setProperty("--d", `${si * 80 + i * 60}ms`);
         bind(seg, `${sys.label} · ${label}: ${n} (${((100 * n) / sys.n).toFixed(1)}%)`);
         st.appendChild(seg);
       });
       row.appendChild(st);
       el.appendChild(row);
     });
-    srTable(el, "Outcomes per system", ["System", ...used.map((u) => u[0])], D.systems.map((x) => [x.label, ...used.map(([k]) => x.outcomes[k] || 0)]));
+    srTable(el, "Outcomes per system", ["System", ...used.map((u) => u[0])], rows.map((x) => [x.label, ...used.map(([k]) => x.outcomes[k] || 0)]));
   }
 
   // ---- waffle: every problem, base vs SFT ----
@@ -339,7 +415,7 @@
   }
 
   punchcard();
-  funnel(); teacher(); outcomes(); waffle(); errors(); harnessChart(); published();
+  funnel(); outcomes(); waffle(); errors(); published(); logoChart();
   reveal();
   loss(); reward();
 })();

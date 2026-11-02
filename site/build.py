@@ -29,18 +29,17 @@ LABELS = {BASE: "Qwen 3.8 27B base", SFT: "+ SFT"}
 EXAMPLE = "HumanEval/138"  # base: 'MOD' is not defined; SFT: FUNCTION MOD, 8/8 tests
 ITERS, SEED = 5000, 0  # same bootstrap as eval/compare.py
 
-# 30-problem teacher check, COBOLEval's section-order fix applied (explainer.md, KJ's eval/run.py run)
-TEACHER_CHECK = [
-    ("Kimi K3", 76.7, True), ("DeepSeek V4.1 Flash", 73.3, False), ("GLM-5.3", 60.0, False),
-    ("Qwen 3.8 27B base", 16.7, False), ("gpt-oss-120b", 3.3, False),
-]
 # Frontier open-weights models run through our own harness (eval/run.py: prompt.py, temperature 0,
-# 4,096 max tokens, same grader as base/SFT). (results id, label, size, thinking level if not off)
+# 4,096 max tokens, same grader as base/SFT). (results id, label, size, thinking level if not off, logo)
 FRONTIER = [
-    ("muse-spark-open", "Muse Spark Open", "816B", "low"), ("qwen3p8-max", "Qwen 3.8 Max", "2.4T", None),
-    ("glm-5p3", "GLM-5.3", "743B", "low"), ("deepseek-v4p1-flash-1017", "DeepSeek V4.1 Flash 1017", "755B", None),
-    ("kimi-k3", "Kimi K3", "2.8T", None),
+    ("muse-spark-open", "Muse Spark Open", "816B", "low", "meta-color"),
+    ("qwen3p8-max", "Qwen 3.8 Max", "2.4T", None, "qwen-color"),
+    ("glm-5p3", "GLM-5.3", "743B", "low", "zai"),
+    ("deepseek-v4p1-flash-1017", "DeepSeek V4.1 Flash 1017", "755B", None, "deepseek-color"),
+    ("kimi-k3", "Kimi K3", "2.8T", None, "kimi"),  # kimi-color is near-white on the light badge
 ]
+OUR_ICON = "qwen-color"
+ICONS = "https://cdn.jsdelivr.net/npm/@lobehub/icons-static-svg@1.95.1/icons/{}.svg"  # LobeHub Icons, pinned
 # Published COBOLEval pass@1, each from its own harness (COBOL-Coder arXiv 2604.03986 Table 3;
 # zorse-project/COBOLEval README)
 PUBLISHED = [
@@ -224,7 +223,7 @@ def harness(sft, systems_stats):
     fix_path = os.path.join(ROOT, "results/section_fix.json")
     fix = json.load(open(fix_path)) if os.path.exists(fix_path) else {}
     out = []
-    for sid, label, size, think in FRONTIER:
+    for sid, label, size, think, icon in FRONTIER:
         path = os.path.join(ROOT, f"results/{sid}.jsonl")
         if not os.path.exists(path):
             continue
@@ -232,7 +231,8 @@ def harness(sft, systems_stats):
         if len(res) < len(sft):
             continue
         st, pr = system_stats(res), paired(sft, res)
-        entry = {"label": label, "size": size, "think": think, "pass": 100 * st["pass_rate"],
+        entry = {"label": label, "size": size, "think": think, "icon": ICONS.format(icon), "outcomes": st["outcomes"],
+                 "n": st["n"], "compiled": st["compiled"], "pass": 100 * st["pass_rate"],
                  "fixed": 100 * fix.get(sid, {}).get("fixed", st["passed"]) / st["n"],
                  "cost": st["cost"] / st["n"], "diff": 100 * pr["diff"], "p": pr["p"], "ours": False,
                  "p_fix": None, "diff_fix": None}
@@ -242,9 +242,12 @@ def harness(sft, systems_stats):
         out.append(entry)
     for s, st in systems_stats.items():  # ours; the fine-tuned ones are highlighted, base stays muted
         label = LABELS[s] if s == BASE else "Qwen 3.8 27B " + LABELS[s]
-        out.append({"label": label, "size": "27B", "think": None, "pass": 100 * st["pass_rate"],
+        out.append({"label": label, "size": "27B", "think": None, "icon": ICONS.format(OUR_ICON), "outcomes": st["outcomes"],
+                    "n": st["n"], "compiled": st["compiled"], "pass": 100 * st["pass_rate"],
                     "fixed": 100 * fix.get(s, {}).get("fixed", st["passed"]) / st["n"],
                     "cost": st["cost"] / st["n"], "diff": None, "p": None, "ours": True, "hl": s != BASE})
+    for e in out:
+        e["params"] = size_b(e)
     return out
 
 
@@ -285,7 +288,7 @@ def main():
     behind = [b["label"] for b in others if b["p"] < 0.05 and b["diff"] < 0]
     fix_ahead = [b["label"] for b in others if b["label"] not in ahead
                  and b["p_fix"] is not None and b["p_fix"] < 0.05 and b["diff_fix"] > 0]
-    fix_note = (f" With COBOLEval's section-order fix (faint bars), {' and '.join(fix_ahead)} also move significantly ahead."
+    fix_note = (f" With COBOLEval's section-order fix (hollow rings), {' and '.join(fix_ahead)} also move significantly ahead."
                 if fix_ahead else "")
 
     data = {
@@ -293,7 +296,6 @@ def main():
         "waffle": [{"id": i, "state": c} for i, c in zip(pair["ids"], pair["cells"])],
         "errors": {LABELS[s]: error_kinds(res[s]) for s in systems},
         "funnel": steps,
-        "teacher": TEACHER_CHECK,
         "harness": board,
         "loss": loss,
         "grpo": rl,

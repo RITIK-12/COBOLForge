@@ -19,7 +19,7 @@
 <nav class="glass top">
   <a class="brand" href="#top">COBOL<span>Forge</span></a>
   <a href="#results">Results</a>
-  <a href="#code">Code</a>
+  <a href="#frontier">vs Frontier</a>
   <a href="https://github.com/RITIK-12/COBOLForge">GitHub ↗</a>
 </nav>
 
@@ -32,23 +32,17 @@
 
   <div class="punch" aria-hidden="true"><svg id="punchcard"></svg></div>
 
-  <div class="stats hero-stats">
-    <div class="stat glass"><b>{{base_pct}}% → {{sft_pct}}%</b><span>pass@1, COBOLEval (146 held-out problems)</span></div>
-    <div class="stat glass"><b>{{diff}} pts</b><span>95% CI {{ci_lo}} to {{ci_hi}}</span></div>
-    <div class="stat glass"><b>p = {{p_html}}</b><span>McNemar: {{b_only}} gained, {{a_only}} lost</span></div>
-    <div class="stat glass"><b>${{sft_cost}}</b><span>SFT compute, about 6 minutes</span></div>
-  </div>
-
   <div class="route">
-    <a class="glass" href="#cobol"><span>01</span>COBOL</a><i>→</i>
-    <a class="glass" href="#bench"><span>02</span>Benchmark</a><i>→</i>
-    <a class="glass" href="#judge"><span>03</span>Judge</a><i>→</i>
+    <a class="glass" href="#cobol"><span>01</span>COBOL?</a><i>→</i>
+    <a class="glass" href="#code-look"><span>02</span>The code</a><i>→</i>
+    <a class="glass" href="#bench"><span>03</span>Benchmark</a><i>→</i>
     <a class="glass" href="#data"><span>04</span>Data</a><i>→</i>
     <a class="glass" href="#sft"><span>05</span>SFT</a><i>→</i>
     <a class="glass" href="#results"><span>06</span>Results</a><i>→</i>
     <a class="glass" href="#code"><span>07</span>Before / after</a><i>→</i>
     <a class="glass" href="#grpo"><span>08</span>GRPO</a><i>→</i>
-    <a class="glass" href="#context"><span>09</span>vs frontier</a>
+    <a class="glass" href="#published"><span>09</span>Published</a><i>→</i>
+    <a class="glass" href="#frontier"><span>10</span>vs Frontier</a>
   </div>
 </header>
 
@@ -57,31 +51,44 @@
 <section class="scene" id="cobol">
   <div class="node">01</div>
   <div class="card glass">
-    <h2>COBOL still runs the back office</h2>
-    <p class="cap">Banks, insurers and governments depend on it. General models write it badly: base Qwen 3.8 27B solves {{base_pct}}% of COBOLEval.</p>
-    <div class="media code-split">
-      <figure>
-        <div class="win">
-          <div class="bar"><i></i><i></i><i></i><span>is_equal_to_sum_even.cbl</span></div>
-          <pre class="cobol">{{ex_prompt}}</pre>
-        </div>
-        <figcaption>A COBOLEval problem, as the model sees it</figcaption>
-      </figure>
-      <ul class="notes">
-        <li><b>LINKAGE SECTION</b><span>Inputs (<code>L-N</code>) and a <code>RESULT</code> slot. No return statement.</span></li>
-        <li><b>PIC S9(10)</b><span>Every variable has a fixed-width picture. Types are byte layouts.</span></li>
-        <li><b>Comments</b><span>The task, in English, with examples.</span></li>
-        <li><b>The model writes</b><span><code>WORKING-STORAGE</code> and the <code>PROCEDURE DIVISION</code>, ending in <code>GOBACK</code>.</span></li>
-      </ul>
+    <h2>COBOL?</h2>
+    <p class="cap">A 1959 business language that still moves money, pays benefits and collects taxes. Few engineers learn it now, and general models write it badly.</p>
+    <div class="stats">
+      <div class="stat glass"><b>$3T</b><span>in daily commerce runs through COBOL systems · Reuters, 2017</span></div>
+      <div class="stat glass"><b>95%</b><span>of US ATM transactions · Anthropic, 2026</span></div>
+      <div class="stat glass"><b>−13.2%</b><span>IBM's one-day drop after Anthropic's COBOL modernization post, Feb 23 2026 · Reuters</span></div>
+      <div class="stat glass"><b>{{base_pct}}%</b><span>of COBOLEval a 27B open model solves out of the box</span></div>
+    </div>
+    <div class="orgs">
+      <figure class="org glass"><img src="https://upload.wikimedia.org/wikipedia/commons/2/26/US-SocialSecurityAdmin-Seal.svg" alt="" loading="lazy"><figcaption><b>Social Security</b><span>benefit systems in COBOL · GAO-16-468</span></figcaption></figure>
+      <figure class="org glass"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/Seal_of_the_United_States_Internal_Revenue_Service.svg" alt="" loading="lazy"><figcaption><b>IRS</b><span>Individual Master File in COBOL and assembly · GAO-16-468</span></figcaption></figure>
+      <figure class="org glass"><img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Seal_of_the_U.S._Department_of_Veterans_Affairs.svg" alt="" loading="lazy"><figcaption><b>Veterans Affairs</b><span>legacy COBOL systems · GAO-16-468</span></figcaption></figure>
+      <figure class="org glass"><img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Seal_of_the_United_States_Department_of_Homeland_Security.svg" alt="" loading="lazy"><figcaption><b>Homeland Security</b><span>legacy COBOL systems · GAO-16-468</span></figcaption></figure>
+      <figure class="org glass"><img src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Seal_of_New_Jersey.svg" alt="" loading="lazy"><figcaption><b>State of New Jersey</b><span>asked for COBOL volunteers to fix unemployment claims, 2020</span></figcaption></figure>
+      <figure class="org glass"><img src="https://upload.wikimedia.org/wikipedia/commons/7/73/Commonwealth_Bank_Logo.svg" alt="" loading="lazy"><figcaption><b>Commonwealth Bank</b><span>5 years and A$1B to replace its COBOL core · Reuters, 2017</span></figcaption></figure>
     </div>
   </div>
 </section>
 
-<section class="scene" id="bench">
+<section class="scene" id="code-look">
   <div class="node">02</div>
   <div class="card glass">
+    <h2>What COBOL looks like</h2>
+    <p class="cap">A COBOLEval problem, as the model sees it. Inputs live in the LINKAGE SECTION, every variable has a fixed-width PIC, and the answer goes into RESULT.</p>
+    <figure>
+      <div class="win">
+        <div class="bar"><i></i><i></i><i></i><span>is_equal_to_sum_even.cbl</span></div>
+        <pre class="cobol">{{ex_prompt}}</pre>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section class="scene" id="bench">
+  <div class="node">03</div>
+  <div class="card glass">
     <h2>COBOLEval: HumanEval, in COBOL</h2>
-    <p class="cap">Compiled with GnuCOBOL 3.2. A problem counts only if every one of its tests passes. Never used for training.</p>
+    <p class="cap">146 problems, 821 tests, compiled with GnuCOBOL 3.2. A problem counts only if every one of its tests passes. Never used for training.</p>
     <div class="flow">
       <div class="step glass"><b>Model's program</b><small>solution.cbl</small></div>
       <div class="plus">+</div>
@@ -91,37 +98,7 @@
       <div class="to">→</div>
       <div class="step glass"><b>Run</b><small>sandboxed, 10 s limit</small></div>
       <div class="to">→</div>
-      <div class="step glass"><b>Result file</b><small>ENTRY-POINT.TXT</small></div>
-      <div class="to">→</div>
       <div class="step glass good"><b>Compare</b><small>typed parse, floats ±0.001</small></div>
-    </div>
-    <div class="stats">
-      <div class="stat glass"><b>146</b><span>problems</span></div>
-      <div class="stat glass"><b>821</b><span>tests</span></div>
-      <div class="stat glass"><b>0</b><span>seen in training</span></div>
-      <div class="stat glass"><b>144</b><span>max score (2 callers broken upstream)</span></div>
-    </div>
-  </div>
-</section>
-
-<section class="scene" id="judge">
-  <div class="node">03</div>
-  <div class="card glass">
-    <h2>One judge for data, score and reward</h2>
-    <p class="cap">Every program goes through the same <code>grade()</code>. It filters the training data, scores the benchmark and pays the RL reward.</p>
-    <div class="flow">
-      <div class="step glass"><b>Static guard</b><small>no CALL, files or EXEC</small></div>
-      <div class="to">→</div>
-      <div class="step glass hot"><b>Compile</b><small>GnuCOBOL 3.2.0</small></div>
-      <div class="to">→</div>
-      <div class="step glass"><b>Run</b><small>sandbox-exec, no network</small></div>
-      <div class="to">→</div>
-      <div class="step glass good"><b>Grade</b><small>compiled · passed · n_pass</small></div>
-    </div>
-    <div class="fan">
-      <div class="glass"><span class="tag">Filter</span><b>Keep a teacher program</b><small>only if it passes every test</small></div>
-      <div class="glass"><span class="tag">Metric</span><b>pass@1 on COBOLEval</b><small>one sample, temperature 0</small></div>
-      <div class="glass"><span class="tag">Reward</span><b>1 · 0.2 · 0</b><small>passes · compiles · neither</small></div>
     </div>
   </div>
 </section>
@@ -130,11 +107,19 @@
   <div class="node">04</div>
   <div class="card glass">
     <h2>{{train_rows}} verified examples, built from scratch</h2>
-    <p class="cap">MBPP's Python tests become COBOL test callers ({{problems}} problems, {{mbpp_tests}} tests). Kimi K3 writes the programs; any that fail a test are dropped.</p>
-    <div class="media two">
-      <figure class="chart glass"><div id="funnel"></div><figcaption>MBPP → train.jsonl</figcaption></figure>
-      <figure class="chart glass"><div id="teacher"></div><figcaption>Teacher pick · 30-problem check · pass@1</figcaption></figure>
+    <p class="cap">No COBOL training set with tests exists, so we made one. The same grader keeps only programs that pass every test.</p>
+    <div class="flow">
+      <div class="step glass"><b>MBPP</b><small>{{mbpp}} Python problems, tests only</small></div>
+      <div class="to">→</div>
+      <div class="step glass"><b>Convert</b><small>{{problems}} COBOL problems, {{mbpp_tests}} test callers</small></div>
+      <div class="to">→</div>
+      <div class="step glass hot"><b>Kimi K3 writes</b><small>{{teacher_n}} COBOL programs</small></div>
+      <div class="to">→</div>
+      <div class="step glass"><b>GnuCOBOL grades</b><small>{{teacher_pass}} pass every test</small></div>
+      <div class="to">→</div>
+      <div class="step glass good"><b>train.jsonl</b><small>{{train_rows}} examples, ≤ 2 per problem</small></div>
     </div>
+    <figure class="chart glass wide"><div id="funnel"></div><figcaption>MBPP → train.jsonl</figcaption></figure>
   </div>
 </section>
 
@@ -149,7 +134,7 @@
       <div class="stat glass"><b>r16</b><span>LoRA · lr 1e-4 · reasoning off</span></div>
       <div class="stat glass"><b>${{sft_cost}}</b><span>{{sft_tokens}} training tokens</span></div>
     </div>
-    <figure class="chart glass wide"><div id="loss" class="line"></div><figcaption>Training loss per step · {{loss_first}} → {{loss_last}}</figcaption></figure>
+    <figure class="chart glass wide"><div id="loss" class="line"></div><figcaption>Training loss, all {{sft_steps}} steps · {{loss_first}} → {{loss_last}}</figcaption></figure>
   </div>
 </section>
 
@@ -164,7 +149,7 @@
       <div class="stat glass"><b>p = {{p_html}}</b><span>McNemar exact</span></div>
       <div class="stat glass"><b>{{base_compile}}% → {{sft_compile}}%</b><span>programs that compile</span></div>
     </div>
-    <figure class="chart glass wide"><div id="outcomes"></div><figcaption>Every problem, by outcome</figcaption></figure>
+    <figure class="chart glass wide"><div id="outcomes"></div><figcaption>Every problem, by outcome · ours, then frontier open models (strict grading)</figcaption></figure>
     <figure class="chart glass wide"><div id="waffle"></div><figcaption>146 problems · base vs SFT · hover for the problem</figcaption></figure>
   </div>
 </section>
@@ -204,13 +189,12 @@
       <div class="to">→</div>
       <div class="step glass"><b>8 attempts</b><small>temperature 1.0</small></div>
       <div class="to">→</div>
-      <div class="step glass hot"><b>grade()</b><small>1 · 0.2 · 0</small></div>
+      <div class="step glass hot"><b>grade()</b><small>1 pass · 0.2 compiles · 0</small></div>
       <div class="to">→</div>
       <div class="step glass"><b>Advantage</b><small>score − group mean</small></div>
       <div class="to">→</div>
       <div class="step glass good"><b>LoRA update</b><small>starts from SFT step-90</small></div>
     </div>
-    <p class="loopback">↺ <em>new problems</em> → next step</p>
     <div class="stats">
       <div class="stat glass"><b>{{pool}} / 459</b><span>problems with a learning signal</span></div>
       <div class="stat glass">{{grpo_t2}}</div>
@@ -221,8 +205,17 @@
   </div>
 </section>
 
-<section class="scene" id="context">
+<section class="scene" id="published">
   <div class="node">09</div>
+  <div class="card glass">
+    <h2>Top of the published COBOLEval results</h2>
+    <p class="cap">Our 27B fine-tune next to every COBOLEval pass@1 we found in print, including COBOL-Coder, a model trained for COBOL. Each source used its own harness.</p>
+    <figure class="chart glass wide"><div id="published-chart"></div><figcaption>COBOL-Coder (arXiv 2604.03986) · zorse-project/COBOLEval README · this repo</figcaption></figure>
+  </div>
+</section>
+
+<section class="scene" id="frontier">
+  <div class="node">10</div>
   <div class="card glass">
     <h2>A 27B next to {{frontier_sizes}} open models</h2>
     <p class="cap">{{n_frontier}} frontier open-weights models on Fireworks, run through our exact harness: same prompt, temperature 0, 4,096 tokens, same grader, all 146 problems. Tiles use strict grading, as for base and SFT.{{fix_note}}</p>
@@ -232,8 +225,7 @@
       <div class="stat glass"><b>{{n_behind}} behind</b><span>{{behind_names}}, strict grading only</span></div>
       <div class="stat glass"><b>${{sft_cost_pp}}</b><span>per problem, our SFT model</span></div>
     </div>
-    <figure class="chart glass wide"><div id="harness"></div><figcaption>Same harness · pass@1 on all 146 · hover for cost and significance vs SFT</figcaption></figure>
-    <figure class="chart glass wide"><div id="published"></div><figcaption>Published elsewhere, each with its own harness · COBOL-Coder (arXiv 2604.03986), zorse-project/COBOLEval README</figcaption></figure>
+    <figure class="chart glass wide"><div id="logos" class="line"></div><figcaption>pass@1 vs model size (log scale) · hollow rings: COBOLEval's section-order fix · hover a logo for details</figcaption></figure>
   </div>
 </section>
 
@@ -242,7 +234,7 @@
 <footer>
   <a class="cta" href="https://github.com/RITIK-12/COBOLForge">Code, data and every result ↗</a>
   <p><a href="https://github.com/RITIK-12/COBOLForge/blob/main/explainer.md">How it works</a> · <a href="https://github.com/RITIK-12/COBOLForge/blob/main/README.md">README</a> · <a href="https://github.com/RITIK-12/COBOLForge/tree/main/results">Per-problem results</a></p>
-  <p>Ritik &amp; KJ. Data: MBPP (CC BY 4.0), COBOLEval (MIT). Trained and evaluated on Fireworks. Built with Claude Code.</p>
+  <p>Ritik &amp; KJ. Data: MBPP (CC BY 4.0), COBOLEval (MIT). Trained and evaluated on Fireworks. Seals and logos via Wikimedia Commons (public domain) and LobeHub Icons. Built with Claude Code.</p>
 </footer>
 
 </main>
