@@ -1,0 +1,37 @@
+{
+ "n_problems": 146,
+ "qwen38-27b-sft": {
+  "pass@1": 0.5136986301369864,
+  "passed": 75,
+  "compiled": 0.7808219178082192,
+  "cost": 0.6020090000000001,
+  "p50_latency_s": 5.99,
+  "outcomes": {
+   "compile error": 32,
+   "pass": 75,
+   "wrong answer": 39
+  }
+ },
+ "glm-5p3": {
+  "pass@1": 0.547945205479452,
+  "passed": 80,
+  "compiled": 0.8424657534246576,
+  "cost": 0.4258780000000001,
+  "p50_latency_s": 4.005,
+  "outcomes": {
+   "pass": 80,
+   "compile error": 23,
+   "wrong answer": 43
+  }
+ },
+ "diff_pass@1": 0.03424657534246575,
+ "bootstrap_95ci": [
+  -0.0547945205479452,
+  0.1232876712328767
+ ],
+ "mcnemar": {
+  "b_only_pass": 26,
+  "a_only_pass": 21,
+  "p_value": 0.5600646295802107
+ }
+}

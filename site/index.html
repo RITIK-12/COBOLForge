@@ -48,7 +48,7 @@
     <a class="glass" href="#results"><span>06</span>Results</a><i>→</i>
     <a class="glass" href="#code"><span>07</span>Before / after</a><i>→</i>
     <a class="glass" href="#grpo"><span>08</span>GRPO</a><i>→</i>
-    <a class="glass" href="#context"><span>09</span>Context</a>
+    <a class="glass" href="#context"><span>09</span>vs frontier</a>
   </div>
 </header>
 
@@ -224,9 +224,16 @@
 <section class="scene" id="context">
   <div class="node">09</div>
   <div class="card glass">
-    <h2>Where it lands</h2>
-    <p class="cap">Published COBOLEval pass@1. Every source ran its own prompt and harness.</p>
-    <figure class="chart glass wide"><div id="published"></div><figcaption>Sources: COBOL-Coder (arXiv 2604.03986), zorse-project/COBOLEval README, this repo</figcaption></figure>
+    <h2>A 27B next to {{frontier_sizes}} open models</h2>
+    <p class="cap">{{n_frontier}} frontier open-weights models on Fireworks, run through our exact harness: same prompt, temperature 0, 4,096 tokens, same grader, all 146 problems. Tiles use strict grading, as for base and SFT.{{fix_note}}</p>
+    <div class="stats">
+      <div class="stat glass"><b>{{n_tied}} tied</b><span>{{tied_names}} (McNemar p ≥ 0.05)</span></div>
+      <div class="stat glass"><b>{{n_ahead}} ahead</b><span>{{ahead_names}}, with thinking on</span></div>
+      <div class="stat glass"><b>{{n_behind}} behind</b><span>{{behind_names}}, strict grading only</span></div>
+      <div class="stat glass"><b>${{sft_cost_pp}}</b><span>per problem, our SFT model</span></div>
+    </div>
+    <figure class="chart glass wide"><div id="harness"></div><figcaption>Same harness · pass@1 on all 146 · hover for cost and significance vs SFT</figcaption></figure>
+    <figure class="chart glass wide"><div id="published"></div><figcaption>Published elsewhere, each with its own harness · COBOL-Coder (arXiv 2604.03986), zorse-project/COBOLEval README</figcaption></figure>
   </div>
 </section>
 

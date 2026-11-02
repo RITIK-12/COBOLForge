@@ -144,6 +144,32 @@
     srTable(el, "Teacher check, pass@1 on 30 problems", ["Model", "pass@1 %"], D.teacher.map((t) => [t[0], t[1]]));
   }
 
+  // same-harness leaderboard: strict pass@1 (solid) plus the extra from COBOLEval's section-order fix (faint)
+  function harnessChart() {
+    const el = $("#harness");
+    if (!el || !D.harness.length) return;
+    const items = [...D.harness].sort((a, b) => b.pass - a.pass);
+    legend(el, [[css("--mark"), "our fine-tune"], [css("--muted"), "strict, as base and SFT are graded"],
+      ["rgba(255,255,255,0.16)", "extra with COBOLEval's section-order fix"]]);
+    const wrap = h("div", "bars");
+    items.forEach((it, i) => {
+      const row = h("div", "row" + (it.hl ? " hl" : ""));
+      const sub = it.size + (it.think ? ` · thinking ${it.think}` : "");
+      row.innerHTML = `<span class="lab">${it.label} <small>· ${sub}</small></span><span class="track">` +
+        (it.fixed > it.pass ? `<i class="ghost" style="--w:${it.fixed}%;--d:${i * 70}ms"></i>` : "") +
+        `<i style="--w:${it.pass}%;--d:${i * 70}ms"></i></span><span class="val">${it.pass.toFixed(1)}%</span>`;
+      const pf = (p) => (p < 0.001 ? p.toExponential(1) : p.toFixed(2));
+      const vs = it.p == null ? "" : ` · vs SFT ${it.diff >= 0 ? "+" : ""}${it.diff.toFixed(1)} pts, p = ${pf(it.p)}` +
+        (it.fixed > it.pass && it.p_fix != null ? ` (with fix: ${it.diff_fix >= 0 ? "+" : ""}${it.diff_fix.toFixed(1)}, p = ${pf(it.p_fix)})` : "");
+      bind(row, `${it.label} · ${it.pass.toFixed(1)}%` + (it.fixed > it.pass ? ` (${it.fixed.toFixed(1)}% with section fix)` : "") +
+        ` · $${it.cost.toFixed(4)}/problem${vs}`);
+      wrap.appendChild(row);
+    });
+    el.appendChild(wrap);
+    srTable(el, "Same-harness COBOLEval pass@1", ["Model", "Size", "pass@1 % strict", "pass@1 % with section fix", "$/problem", "p vs SFT"],
+      items.map((x) => [x.label, x.size, x.pass.toFixed(1), x.fixed.toFixed(1), x.cost.toFixed(4), x.p == null ? "" : x.p.toPrecision(2)]));
+  }
+
   function published() {
     const el = $("#published");
     const items = [...D.published].sort((a, b) => b[1] - a[1]);
@@ -313,7 +339,7 @@
   }
 
   punchcard();
-  funnel(); teacher(); outcomes(); waffle(); errors(); published();
+  funnel(); teacher(); outcomes(); waffle(); errors(); harnessChart(); published();
   reveal();
   loss(); reward();
 })();

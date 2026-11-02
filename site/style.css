@@ -271,6 +271,7 @@ pre.term {
   transition: transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0s);
 }
 .bars .row.hl .track i { background: var(--mark); }
+.bars .track i.ghost, .bars .row.hl .track i.ghost { background: rgba(255, 255, 255, 0.16); }
 .bars .val { font: 500 12.5px var(--mono); color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
 .in .bars .track i, .in .grp i { transform: none; }
 .bars .row .lab small { color: var(--ink-faint); font-size: 11px; }

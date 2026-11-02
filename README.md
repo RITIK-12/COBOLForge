@@ -29,6 +29,33 @@ temperature 0, max_tokens 4096, one sample per problem. Graded by `grader/grade.
   problem, ~$12 for all 146. 11/146 responses cached in `eval/cache/qwen38-27b-base-think/`. Resume (skips
   cached work): `.venv-train/bin/python -m eval.run_insession --systems base-think`.
 
+### Frontier open models, same harness (all 146 problems)
+
+Five frontier open-weights models on Fireworks serverless, run through `eval/run.py` with the same
+`prompt.py`, temperature 0, max_tokens 4096 and the same `grade(construct(...))` as base and SFT.
+Thinking off where the API allows it; Muse Spark Open and GLM-5.3 reject `"none"`, so they run at `"low"`.
+**Strict** = exactly how base and SFT are scored. **Section fix** = cached outputs re-graded with
+COBOLEval's own `swap_sections` (moves WORKING-STORAGE above LINKAGE), no new model calls (`eval/regrade_swap.py`).
+
+| System | Size | pass@1 strict | vs SFT, strict (McNemar) | pass@1 with section fix | vs SFT, section fix | $/problem |
+| --- | --- | --- | --- | --- | --- | --- |
+| Muse Spark Open (thinking low) | 816B | 112/146 (76.7%) | +25.3, p = 4e-7 | 76.7% | p = 4e-7 | $0.0055 |
+| Qwen 3.8 Max | 2.4T | 87 (59.6%) | +8.2, p = 0.08 (n.s.) | 59.6% | p = 0.08 | $0.0051 |
+| GLM-5.3 (thinking low) | 743B | 80 (54.8%) | +3.4, p = 0.56 (n.s.) | 54.8% | p = 0.56 | $0.0029 |
+| **Qwen 3.8 27B + SFT (ours)** | 27B | **75 (51.4%)** | | 51.4% | | $0.0041 |
+| DeepSeek V4.1 Flash 1017 | 755B | 73 (50.0%) | −1.4, p = 0.88 (n.s.) | 66.4% | +15.1, p = 0.001 | $0.0008 |
+| Kimi K3 | 2.8T | 28 (19.2%) | −32.2, p = 4e-9 | 74.0% | +22.6, p = 5e-7 | $0.0104 |
+| Qwen 3.8 27B base | 27B | 19 (13.0%) | | 13.0% | | $0.0051 |
+
+- Strict: our 27B is not significantly different from Qwen 3.8 Max, GLM-5.3 and DeepSeek V4.1 Flash 1017;
+  only Muse Spark Open (thinking on) is ahead. With the section fix, Kimi K3 and DeepSeek also move ahead.
+- Kimi K3 fails strict grading mostly by copying the skeleton's section order (108 compile errors);
+  our SFT data came from Kimi's passing programs, which have the right order.
+- Costs: list prices for the chat models (prefill uncached); ours is the training-sampler rate. Upper bounds.
+- Rows: `results/{system}.jsonl`, raw responses `results/raw/{system}/`, paired stats
+  `results/compare_qwen38-27b-sft_vs_{system}.json`, section-fix scores `results/section_fix.json`.
+  Reproduce: `.venv/bin/python -m eval.run --system <name>` (skips cached rows), then `eval.compare` / `eval.regrade_swap`.
+
 Per-problem rows: `results/qwen38-27b-{base,sft}.jsonl`; raw model outputs: `eval/cache/`; stats:
 `results/compare_qwen38-27b-base_vs_qwen38-27b-sft.json` (`eval/compare.py`). Reproduce with
 `.venv-train/bin/python -m eval.run_insession` then `.venv/bin/python -m eval.compare qwen38-27b-base qwen38-27b-sft`.

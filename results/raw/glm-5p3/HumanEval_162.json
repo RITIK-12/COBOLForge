@@ -1,0 +1,1 @@
+{"text": "", "reasoning_chars": 10484, "finish_reason": "length", "prompt_tokens": 384, "completion_tokens": 4096, "latency_s": 41.925047636032104, "request": {"model": "accounts/fireworks/models/glm-5p3", "temperature": 0.0, "max_tokens": 4096, "reasoning_effort": "low"}}

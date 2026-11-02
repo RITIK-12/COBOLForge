@@ -26,4 +26,9 @@ SYSTEMS = {
     "deepseek-v4p1-flash": dict(kind="chat", model=FW + "deepseek-v4p1-flash", reasoning_effort="none", price_in=0.30, price_out=1.20),
     # gpt-oss rejects reasoning_effort="none" (HTTP 400 "Invalid reasoning effort: none"); "low" is its minimum
     "gpt-oss-120b": dict(kind="chat", model=FW + "gpt-oss-120b", reasoning_effort="low", price_in=0.15, price_out=0.60),
+    # frontier open-weights context rows, all 146 (prices: docs serverless/pricing, 2026-11-02)
+    "qwen3p8-max": dict(kind="chat", model=FW + "qwen3p8-max", reasoning_effort="none", price_in=2.00, price_out=6.00),
+    # Muse Spark Open is reasoning-only (HTTP 400 on "none": "disabling thinking ... is not supported"); "low" is its minimum
+    "muse-spark-open": dict(kind="chat", model=FW + "muse-spark-open", reasoning_effort="low", price_in=1.25, price_out=4.25),
+    "deepseek-v4p1-flash-1017": dict(kind="chat", model=FW + "deepseek-v4p1-flash-1017", reasoning_effort="none", price_in=0.30, price_out=1.20),
 }

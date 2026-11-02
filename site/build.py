@@ -34,6 +34,13 @@ TEACHER_CHECK = [
     ("Kimi K3", 76.7, True), ("DeepSeek V4.1 Flash", 73.3, False), ("GLM-5.3", 60.0, False),
     ("Qwen 3.8 27B base", 16.7, False), ("gpt-oss-120b", 3.3, False),
 ]
+# Frontier open-weights models run through our own harness (eval/run.py: prompt.py, temperature 0,
+# 4,096 max tokens, same grader as base/SFT). (results id, label, size, thinking level if not off)
+FRONTIER = [
+    ("muse-spark-open", "Muse Spark Open", "816B", "low"), ("qwen3p8-max", "Qwen 3.8 Max", "2.4T", None),
+    ("glm-5p3", "GLM-5.3", "743B", "low"), ("deepseek-v4p1-flash-1017", "DeepSeek V4.1 Flash 1017", "755B", None),
+    ("kimi-k3", "Kimi K3", "2.8T", None),
+]
 # Published COBOLEval pass@1, each from its own harness (COBOL-Coder arXiv 2604.03986 Table 3;
 # zorse-project/COBOLEval README)
 PUBLISHED = [
@@ -212,6 +219,40 @@ def example():
     }
 
 
+def harness(sft, systems_stats):
+    """Same-harness leaderboard: ours + every frontier model with all 146 rows, paired vs SFT."""
+    fix_path = os.path.join(ROOT, "results/section_fix.json")
+    fix = json.load(open(fix_path)) if os.path.exists(fix_path) else {}
+    out = []
+    for sid, label, size, think in FRONTIER:
+        path = os.path.join(ROOT, f"results/{sid}.jsonl")
+        if not os.path.exists(path):
+            continue
+        res = results(sid)
+        if len(res) < len(sft):
+            continue
+        st, pr = system_stats(res), paired(sft, res)
+        entry = {"label": label, "size": size, "think": think, "pass": 100 * st["pass_rate"],
+                 "fixed": 100 * fix.get(sid, {}).get("fixed", st["passed"]) / st["n"],
+                 "cost": st["cost"] / st["n"], "diff": 100 * pr["diff"], "p": pr["p"], "ours": False,
+                 "p_fix": None, "diff_fix": None}
+        if sid in fix and SFT in fix:  # same McNemar, both sides scored with the section-order fix
+            o, s = set(fix[sid]["fixed_ids"]), set(fix[SFT]["fixed_ids"])
+            entry["p_fix"], entry["diff_fix"] = mcnemar_exact(len(o - s), len(s - o)), 100 * (len(o) - len(s)) / st["n"]
+        out.append(entry)
+    for s, st in systems_stats.items():  # ours; the fine-tuned ones are highlighted, base stays muted
+        label = LABELS[s] if s == BASE else "Qwen 3.8 27B " + LABELS[s]
+        out.append({"label": label, "size": "27B", "think": None, "pass": 100 * st["pass_rate"],
+                    "fixed": 100 * fix.get(s, {}).get("fixed", st["passed"]) / st["n"],
+                    "cost": st["cost"] / st["n"], "diff": None, "p": None, "ours": True, "hl": s != BASE})
+    return out
+
+
+def size_b(entry):
+    """'743B' / '2.4T' -> billions, for ordering."""
+    return float(entry["size"][:-1]) * (1000 if entry["size"].endswith("T") else 1)
+
+
 def pct(x, d=1):
     return f"{100 * x:.{d}f}"
 
@@ -237,6 +278,15 @@ def main():
     rl = grpo()
     ex = example()
     grpo_pair = paired(sft, res[systems[2]]) if grpo_files else None
+    board = harness(sft, stats)
+    others = [b for b in board if not b["ours"]]
+    ahead = [b["label"] for b in others if b["p"] < 0.05 and b["diff"] > 0]
+    tied = [b["label"] for b in others if b["p"] >= 0.05]
+    behind = [b["label"] for b in others if b["p"] < 0.05 and b["diff"] < 0]
+    fix_ahead = [b["label"] for b in others if b["label"] not in ahead
+                 and b["p_fix"] is not None and b["p_fix"] < 0.05 and b["diff_fix"] > 0]
+    fix_note = (f" With COBOLEval's section-order fix (faint bars), {' and '.join(fix_ahead)} also move significantly ahead."
+                if fix_ahead else "")
 
     data = {
         "systems": [{"id": s, "label": LABELS[s], **stats[s]} for s in systems],
@@ -244,6 +294,7 @@ def main():
         "errors": {LABELS[s]: error_kinds(res[s]) for s in systems},
         "funnel": steps,
         "teacher": TEACHER_CHECK,
+        "harness": board,
         "loss": loss,
         "grpo": rl,
         "grpo_eval": ({k: v for k, v in grpo_pair.items() if k not in ("cells", "ids")} if grpo_pair else None),
@@ -290,6 +341,11 @@ def main():
         "pool": rl["pool"], "grpo_t2": grpo_t2, "grpo_t3": grpo_t3, "grpo_status": grpo_status,
         "ex_prompt": ex["prompt"], "ex_base": ex["base"], "ex_sft": ex["sft"], "ex_error": ex["error"],
         "ex_tests": ex["tests"], "ex_id": EXAMPLE,
+        "n_frontier": len(others), "n_tied": len(tied), "n_ahead": len(ahead), "n_behind": len(behind),
+        "tied_names": ", ".join(tied) or "none", "ahead_names": ", ".join(ahead) or "none",
+        "behind_names": ", ".join(behind) or "none", "fix_note": fix_note,
+        "frontier_sizes": f"{min(others, key=size_b)['size']}–{max(others, key=size_b)['size']}" if others else "",
+        "sft_cost_pp": f"{ss['cost'] / ss['n']:.4f}",
     }
 
     page = open(os.path.join(SITE, "index.html")).read()
