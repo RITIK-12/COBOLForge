@@ -21,8 +21,11 @@ temperature 0, max_tokens 4096, one sample per problem. Graded by `grader/grade.
   the gain is +34.6 points (12.8% -> 47.4%, n=133, CI [+25.6, +43.6], p = 1e-11); at >= 0.25 (22 dropped)
   it is +32.3 points (p = 5e-10).
 - Caveats: one training run, one seed, n=146; HumanEval/74 and /160 can't pass for any system (broken
-  dataset callers); base evaluated with thinking off (same mode as SFT; a thinking-on base row is not run yet);
-  costs are upper bounds (prefill billed as uncached).
+  dataset callers); base evaluated with thinking off (same mode as SFT); costs are upper bounds (prefill
+  billed as uncached).
+- Thinking-on base (context row, paused): renderer `qwen3_8`, 32k budget; ~10-22k tokens and 70-140s per
+  problem, ~$12 for all 146. 11/146 responses cached in `eval/cache/qwen38-27b-base-think/`. Resume (skips
+  cached work): `.venv-train/bin/python -m eval.run_insession --systems base-think`.
 
 Per-problem rows: `results/qwen38-27b-{base,sft}.jsonl`; raw model outputs: `eval/cache/`; stats:
 `results/compare_qwen38-27b-base_vs_qwen38-27b-sft.json` (`eval/compare.py`). Reproduce with

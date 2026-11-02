@@ -33,7 +33,11 @@ BASE_MODEL = "accounts/fireworks/models/qwen3p8-27b"
 TOKENIZER = "Qwen/Qwen3.8-27B"
 RENDERER = "qwen3_8_disable_thinking_interleaved"
 SFT_STATE = "ritik-7xa24uxitcg9/run-94dffbdc3914486d9d362a614f824d0c/step-90"
-SYSTEMS = {"base": "qwen38-27b-base", "sft": "qwen38-27b-sft"}
+SYSTEMS = {"base": "qwen38-27b-base", "sft": "qwen38-27b-sft", "base-think": "qwen38-27b-base-think"}
+# base-think: context row only. Base model with thinking ON (cookbook default renderer `qwen3_8`, the HF
+# serving default) and a large budget so reasoning isn't cut off; passes using <= 4096 completion
+# tokens are what the standard 4096 budget would give (temperature 0).
+THINK_RENDERER, THINK_MAX_TOKENS = "qwen3_8", 32768
 MAX_TOKENS, TEMPERATURE, SEED, CONCURRENCY = 4096, 0.0, 0, 16
 # Serverless Training sampler rates, $/1M tokens (docs, 2026-11-02); prefill billed uncached (upper bound)
 PREFILL_RATE, SAMPLE_RATE = 1.86, 5.595
@@ -59,9 +63,6 @@ def main():
     if args.limit:
         problems = problems[: args.limit]
     tok = load_tokenizer(TOKENIZER)
-    renderer = build_renderer(tok, TOKENIZER, RENDERER)
-    params = tinker.SamplingParams(max_tokens=MAX_TOKENS, temperature=TEMPERATURE, seed=SEED,
-                                   stop=renderer.get_stop_sequences())
 
     service = FiretitanServiceClient(api_key=os.environ["FIREWORKS_API_KEY"],
                                      base_url="https://api.fireworks.ai/training/v1/serverless")
@@ -80,7 +81,11 @@ def main():
             if not todo:
                 continue
 
-            if key == "base":
+            think = key == "base-think"
+            renderer = build_renderer(tok, TOKENIZER, THINK_RENDERER if think else RENDERER)
+            params = tinker.SamplingParams(max_tokens=THINK_MAX_TOKENS if think else MAX_TOKENS,
+                                           temperature=TEMPERATURE, seed=SEED, stop=renderer.get_stop_sequences())
+            if key in ("base", "base-think"):
                 sampler = service.create_sampling_client(base_model=BASE_MODEL, tokenizer=tok)
             else:
                 tc = service.create_training_client_from_state(SFT_STATE)
@@ -98,7 +103,8 @@ def main():
                     resp = sampler.sample(prompt, num_samples=1, sampling_params=params).result(timeout=900)
                     seq = resp.sequences[0]
                     msg, _ = renderer.parse_response(list(seq.tokens))
-                    c = {"id": p["task_id"], "text": get_text_content(msg), "raw": tok.decode(list(seq.tokens)),
+                    raw = tok.decode(list(seq.tokens))
+                    c = {"id": p["task_id"], "text": get_text_content(msg), "raw": raw[-6000:] if think else raw,
                          "prompt_tokens": prompt.length, "completion_tokens": len(seq.tokens),
                          "stop_reason": str(seq.stop_reason), "latency_s": round(time.time() - t, 2)}
                     json.dump(c, open(cache, "w"))
