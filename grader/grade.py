@@ -17,6 +17,7 @@ MBPP-derived training problems must use the same shape.
 import ast
 import math
 import os
+import re
 import resource
 import shutil
 import subprocess
@@ -95,6 +96,47 @@ def _limits():
             pass
 
 
+# Static guard: solutions must not touch files, shell out, or call anything except their
+# own entry point (the only CALL target any COBOLEval caller uses; allows recursion).
+_BLOCKED = [
+    re.compile(r"(?<![\w-])SELECT\s+(?:OPTIONAL\s+)?[\w-]+\s+ASSIGN(?![\w-])"),
+    re.compile(r"(?<![\w-])OPEN(?![\w-])"),
+    re.compile(r"(?<![\w-])DELETE\s+FILE(?![\w-])"),
+    re.compile(r"(?<![\w-])EXEC(?![\w-])"),
+]
+_CALL = re.compile(r"(?<![\w-])CALL\s+(\S+)")
+_TOKEN = re.compile(r"\"[^\"\n]*\"|'[^'\n]*'|\S+")
+
+
+def _strip_comments(program: str):
+    """Upper-case code without comments, plus a copy with literal contents blanked.
+    Blanking keeps lengths, so offsets in one line up with the other."""
+    lines = []
+    for line in program.upper().split("\n"):
+        if len(line) > 6 and line[6] in "*/":  # indicator-area comment
+            continue
+        lines.append(line.split("*>", 1)[0])  # floating comment
+    code = "\n".join(lines)
+    blank = re.sub(r"\"[^\"\n]*\"|'[^'\n]*'",
+                   lambda m: m.group(0)[0] + " " * (len(m.group(0)) - 2) + m.group(0)[0], code)
+    return code, blank
+
+
+def blocked_reason(program: str, entry_point: str):
+    """None if the program passes the static guard, else the offending construct."""
+    code, blank = _strip_comments(program)
+    for pat in _BLOCKED:
+        m = pat.search(blank)
+        if m:
+            return " ".join(m.group(0).split())
+    ep = entry_point.upper().replace("_", "-")
+    for m in _CALL.finditer(blank):
+        target = _TOKEN.match(code, m.start(1)).group(0)  # real literal, not the blanked one
+        if target.strip("\"'.") != ep:  # dynamic CALL <identifier> is also rejected
+            return f"CALL {target}"
+    return None
+
+
 def _expected(test):
     true = ast.literal_eval(test["result"]["value"])
     return list(true) if isinstance(true, tuple) else true
@@ -106,6 +148,9 @@ def grade(program: str, problem: dict) -> dict:
     out = {"compiled": False, "passed": False, "n_pass": 0, "n_tests": len(tests), "error": None}
     if not program or not program.strip():
         out["error"] = "empty program"
+        return out
+    if blocked_reason(program, name):
+        out["error"] = "blocked"
         return out
 
     with tempfile.TemporaryDirectory(prefix="cobgrade_") as d:
@@ -199,6 +244,9 @@ def _self_test() -> int:
         ("reference", good, dict(compiled=True, passed=True, n_pass=4)),
         ("wrong answer", good.replace("MOVE 1 TO RESULT", "MOVE 0 TO RESULT"), dict(compiled=True, passed=False, n_pass=2)),
         ("compile error", good.replace("END-PERFORM\n           GOBACK", "GOBACK"), dict(compiled=False, passed=False, n_pass=0)),
+        ("blocked CALL", good.replace("MOVE 0 TO RESULT\n", 'MOVE 0 TO RESULT\n           CALL "SYSTEM" USING "echo pwned"\n', 1), dict(compiled=False, passed=False, error="blocked")),
+        ("blocked OPEN", good.replace("MOVE 0 TO RESULT\n", "MOVE 0 TO RESULT\n           OPEN OUTPUT F\n", 1), dict(compiled=False, passed=False, error="blocked")),
+        ("comment words", good.replace("MOVE 0 TO RESULT\n", "MOVE 0 TO RESULT\n      * OPEN the file, CALL system, EXEC SQL\n           DISPLAY 'OPEN CALL EXEC' WITH NO ADVANCING *> DELETE FILE\n", 1), dict(compiled=True, passed=True, n_pass=4)),
         ("infinite loop", good.replace("MOVE 0 TO RESULT\n", "MOVE 0 TO RESULT\n           PERFORM UNTIL 1 = 2 CONTINUE END-PERFORM\n", 1), dict(compiled=True, passed=False, n_pass=0)),
     ]
     ok = True
@@ -208,6 +256,18 @@ def _self_test() -> int:
         good_case = all(r[k] == v for k, v in want.items())
         ok &= good_case
         print(f"{'PASS' if good_case else 'FAIL'}  {label:14s} {time.time()-t:5.1f}s  {r}")
+
+    guard = [
+        (blocked_reason('       CALL "HAS-CLOSE-ELEMENTS" USING LINKED-ITEMS', p0["entry_point"]) is None, "self CALL allowed"),
+        (blocked_reason("       CALL WS-PROG USING X", p0["entry_point"]) is not None, "dynamic CALL blocked"),
+        (blocked_reason("       SELECT OUT-F ASSIGN TO 'x.txt'", p0["entry_point"]) is not None, "SELECT ASSIGN blocked"),
+        (blocked_reason("       DELETE FILE F", p0["entry_point"]) is not None, "DELETE FILE blocked"),
+        (blocked_reason("       MOVE 1 TO OPEN-COUNT CALL-IDX", p0["entry_point"]) is None, "hyphenated names allowed"),
+        (blocked_reason("       DISPLAY 'CALL X' CALL \"SYSTEM\"", p0["entry_point"]) is not None, "CALL after literal blocked"),
+    ]
+    for passed_, label in guard:
+        ok &= passed_
+        print(f"{'PASS' if passed_ else 'FAIL'}  guard: {label}")
 
     stub = "```cobol\n       PROCEDURE DIVISION.\n           GOBACK.\n```"
     progs = [construct(p["prompt"], stub) + f"\n       END PROGRAM {p['entry_point'].upper().replace('_', '-')}.\n" for p in problems]
