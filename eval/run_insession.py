@@ -51,7 +51,15 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=0)
     ap.add_argument("--systems", default="base,sft")
+    ap.add_argument("--state", action="append", default=[], metavar="NAME=CHECKPOINT",
+                    help="extra tuned system scored like sft, e.g. grpo=<account>/<run>/<step>; "
+                         "rows go to results/qwen38-27b-NAME.jsonl")
     args = ap.parse_args()
+    states = {"sft": SFT_STATE}
+    for spec in args.state:
+        name, ref = spec.split("=", 1)
+        SYSTEMS[name] = f"qwen38-27b-{name}"
+        states[name] = ref
 
     from fireworks.training import tinker
     from fireworks.training.sdk import FiretitanServiceClient
@@ -88,9 +96,9 @@ def main():
             if key in ("base", "base-think"):
                 sampler = service.create_sampling_client(base_model=BASE_MODEL, tokenizer=tok)
             else:
-                tc = service.create_training_client_from_state(SFT_STATE)
-                path = tc.save_weights_for_sampler("cobol-eval").result().path
-                print(f"[{system}] loaded {SFT_STATE} -> sampler {path}", flush=True)
+                tc = service.create_training_client_from_state(states[key])
+                path = tc.save_weights_for_sampler(f"eval-{key}"[:17]).result().path
+                print(f"[{system}] loaded {states[key]} -> sampler {path}", flush=True)
                 sampler = service.create_sampling_client(model_path=path, tokenizer=tok, training_client=tc)
 
             def run(p):
