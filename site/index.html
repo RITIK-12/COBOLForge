@@ -37,8 +37,8 @@
     <a class="glass" href="#code-look"><span>02</span>The code</a><i>→</i>
     <a class="glass" href="#bench"><span>03</span>Benchmark</a><i>→</i>
     <a class="glass" href="#data"><span>04</span>Data</a><i>→</i>
-    <a class="glass" href="#sft"><span>05</span>SFT</a><i>→</i>
-    <a class="glass" href="#results"><span>06</span>Results</a><i>→</i>
+    <a class="glass" href="#sft"><span>05</span>Training</a><i>→</i>
+    <a class="glass" href="#results"><span>06</span>Evaluation</a><i>→</i>
     <a class="glass" href="#code"><span>07</span>Before / after</a><i>→</i>
     <a class="glass" href="#grpo"><span>08</span>GRPO</a><i>→</i>
     <a class="glass" href="#published"><span>09</span>Published</a><i>→</i>
@@ -146,7 +146,7 @@
 <section class="scene" id="sft">
   <div class="node">05</div>
   <div class="card glass">
-    <h2>Six minutes of LoRA SFT</h2>
+    <h2>Training</h2>
     <p class="cap">Fireworks Serverless Training, no GPUs to provision. Loss is computed on the program only, not the prompt.</p>
     <div class="stats">
       <div class="stat glass"><b>{{train_rows}}</b><span>examples, {{train_problems}} problems</span></div>
@@ -161,7 +161,7 @@
 <section class="scene" id="results">
   <div class="node">06</div>
   <div class="card glass">
-    <h2>{{base_pct}}% → {{sft_pct}}% on held-out COBOLEval</h2>
+    <h2>Evaluation</h2>
     <p class="cap">Same model, prompt, sampler and grader. Temperature 0, one sample per problem.</p>
     <div class="stats">
       <div class="stat glass"><b>{{diff}} pts</b><span>95% CI {{ci_lo}} to {{ci_hi}}</span></div>
