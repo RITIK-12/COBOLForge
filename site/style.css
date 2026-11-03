@@ -8,7 +8,7 @@
   --mark-2: #3987e5;         /* second chart series when needed */
   --muted: #59606e;          /* chart context marks */
   --good: #0ca30c;
-  --warn: #fab219;
+  --serious: #ec835a;       /* status "serious": compile error (less severe than a wrong answer) */
   --crit: #d03b3b;
   --grid: rgba(255, 255, 255, 0.07);
   --card: #efe5cb;
@@ -286,7 +286,7 @@ pre.term {
 
 /* who runs COBOL: one box per sector, logos inside */
 .stats.three { grid-template-columns: repeat(3, 1fr); }
-.sectors { display: grid; grid-template-columns: 1.45fr 1fr 1fr; gap: 10px; margin-top: 12px; }
+.sectors { display: grid; grid-template-columns: 1fr 0.8fr 1.3fr; gap: 10px; margin-top: 12px; }
 .sector { padding: 16px 18px 18px; border-radius: 20px; min-width: 0; }
 .sector h3 { margin: 0 0 4px; font-family: var(--display); font-size: 19px; font-weight: 700; letter-spacing: -0.02em; }
 .sector p { margin: 0 0 14px; font-size: 12.5px; color: var(--ink-dim); line-height: 1.4; }
@@ -299,12 +299,27 @@ pre.term {
 /* logo chart */
 #logos .badge { cursor: default; }
 #logos .badge:hover circle { stroke-width: 3; }
-.logo-legend { display: flex; flex-wrap: wrap; gap: 8px 10px; margin-top: 14px; }
-.logo-legend .lg { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 6px; border-radius: 999px; font-size: 13px; background: rgba(255, 255, 255, 0.04); box-shadow: inset 0 0 0 1px var(--glass-stroke); }
-.logo-legend .lg.hl { box-shadow: inset 0 0 0 1.5px var(--mark); }
-.logo-legend .lg i { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #f6f3ea; }
-.logo-legend .lg img { width: 17px; height: 17px; }
-.logo-legend .lg small { font: 500 11.5px var(--mono); color: var(--ink-faint); }
+#logos svg { display: block; overflow: visible; }
+#logos text { font: 500 10.5px var(--mono); fill: var(--ink-faint); }
+.logo-wrap { display: grid; grid-template-columns: 1fr 250px; gap: 18px; align-items: center; }
+.logo-wrap .plot { min-width: 0; }
+.logo-legend { display: flex; flex-direction: column; gap: 6px; }
+.logo-legend .lg { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 10px; padding: 5px 12px 5px 5px; border-radius: 999px; font-size: 13px; background: rgba(255, 255, 255, 0.04); box-shadow: inset 0 0 0 1px var(--glass-stroke); }
+.logo-legend .lg.ours { color: var(--ember); box-shadow: inset 0 0 0 1.5px var(--mark); }
+.logo-legend .lg i { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #f6f3ea; }
+.logo-legend .lg img { width: 18px; height: 18px; }
+.logo-legend .lg b { font: 600 12px var(--mono); }
+
+/* same-harness table */
+table.lb { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.lb th { text-align: left; font: 600 11px var(--mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); padding: 0 12px 10px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+table.lb td { padding: 9px 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.06); font-variant-numeric: tabular-nums; }
+table.lb td:not(:first-child), table.lb th:not(:first-child) { font-family: var(--mono); font-size: 13px; text-align: right; }
+table.lb td:first-child { display: flex; align-items: center; gap: 10px; }
+table.lb td i { display: grid; place-items: center; flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; background: #f6f3ea; }
+table.lb td img { width: 17px; height: 17px; }
+table.lb tr.ours td { color: var(--ember); font-weight: 600; background: rgba(232, 102, 42, 0.08); }
+table.lb tr.ours td i { box-shadow: 0 0 0 2px var(--mark); }
 
 .stack-row { display: grid; grid-template-columns: 200px 1fr; gap: 12px; align-items: center; margin-bottom: 12px; }
 .stack-row.ours .lab { color: var(--ember); }
@@ -328,8 +343,8 @@ pre.term {
 .stack i:last-child { border-radius: 0 4px 4px 0; }
 .in .stack i { transform: none; }
 .s-pass { background: var(--good); }
-.s-wrong { background: var(--warn); color: #0b0b0b !important; }
-.s-compile { background: var(--crit); }
+.s-wrong { background: var(--crit); }
+.s-compile { background: var(--serious); color: #0b0b0b !important; }
 .s-blocked { background: #6b6b66; }
 
 .waffle { display: grid; grid-template-columns: repeat(30, 1fr); gap: 4px; }
@@ -381,7 +396,9 @@ footer p { margin: 10px 0; }
   .media.two, .media.code-split { grid-template-columns: 1fr; }
   .stats { grid-template-columns: repeat(2, 1fr); }
   .fan { grid-template-columns: 1fr; }
-  .logo-legend .lg { width: 100%; border-radius: 14px; }
+  .logo-wrap { grid-template-columns: 1fr; }
+  table.lb { font-size: 12.5px; }
+  table.lb td, table.lb th { padding-left: 6px; padding-right: 6px; }
   .stats.three { grid-template-columns: 1fr; }
   .sectors { grid-template-columns: 1fr; }
   .sector .logos figure { width: 52px; }

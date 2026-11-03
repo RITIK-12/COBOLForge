@@ -61,13 +61,11 @@
     <div class="sectors">
       <div class="sector glass">
         <h3>Government</h3>
-        <p>Benefits, taxes and unemployment claims · GAO-16-468; New Jersey, 2020</p>
+        <p>Benefits, taxes and veterans' claims · GAO-16-468</p>
         <div class="logos">
           <figure title="Social Security Administration"><img src="https://upload.wikimedia.org/wikipedia/commons/2/26/US-SocialSecurityAdmin-Seal.svg" alt="Social Security Administration" loading="lazy"><figcaption>SSA</figcaption></figure>
           <figure title="Internal Revenue Service"><img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/Seal_of_the_United_States_Internal_Revenue_Service.svg" alt="Internal Revenue Service" loading="lazy"><figcaption>IRS</figcaption></figure>
           <figure title="Department of Veterans Affairs"><img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Seal_of_the_U.S._Department_of_Veterans_Affairs.svg" alt="Department of Veterans Affairs" loading="lazy"><figcaption>VA</figcaption></figure>
-          <figure title="Department of Homeland Security"><img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Seal_of_the_United_States_Department_of_Homeland_Security.svg" alt="Department of Homeland Security" loading="lazy"><figcaption>DHS</figcaption></figure>
-          <figure title="State of New Jersey"><img src="https://upload.wikimedia.org/wikipedia/commons/8/8d/Seal_of_New_Jersey.svg" alt="State of New Jersey" loading="lazy"><figcaption>NJ</figcaption></figure>
         </div>
       </div>
       <div class="sector glass">
@@ -80,10 +78,12 @@
       </div>
       <div class="sector glass">
         <h3>Banking &amp; payments</h3>
-        <p>92 of the top 100 banks ran their core on COBOL mainframes · IBM via Computerworld; Reuters, 2017</p>
+        <p>92 of the top 100 banks ran their core on COBOL mainframes · IBM via Computerworld</p>
         <div class="logos">
-          <figure title="Commonwealth Bank of Australia: 5 years and A$1B to replace its COBOL core"><img src="https://upload.wikimedia.org/wikipedia/commons/7/73/Commonwealth_Bank_Logo.svg" alt="Commonwealth Bank of Australia" loading="lazy"><figcaption>CommBank</figcaption></figure>
-          <figure title="BNY: over half of its major applications on the mainframe"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6e/BNY_logo_2024.svg" alt="BNY" loading="lazy"><figcaption>BNY</figcaption></figure>
+          <figure title="JPMorgan Chase"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Logo_of_JPMorganChase_2024.svg" alt="JPMorgan Chase" loading="lazy"><figcaption>JPMC</figcaption></figure>
+          <figure title="Bank of America"><img src="https://upload.wikimedia.org/wikipedia/commons/2/20/Bank_of_America_logo.svg" alt="Bank of America" loading="lazy"><figcaption>BofA</figcaption></figure>
+          <figure title="Citi"><img src="https://upload.wikimedia.org/wikipedia/commons/7/73/Citi_logo_March_2023.svg" alt="Citi" loading="lazy"><figcaption>Citi</figcaption></figure>
+          <figure title="Wells Fargo"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e2/Wells_Fargo_Logo_%282020%29.svg" alt="Wells Fargo" loading="lazy"><figcaption>Wells Fargo</figcaption></figure>
         </div>
       </div>
     </div>
@@ -245,7 +245,8 @@
       <div class="stat glass"><b>{{n_behind}} behind</b><span>{{behind_names}}, strict grading only</span></div>
       <div class="stat glass"><b>${{sft_cost_pp}}</b><span>per problem, our SFT model</span></div>
     </div>
-    <figure class="chart glass wide"><div id="logos" class="line"></div><figcaption>pass@1 vs model size (log scale) · hollow rings: COBOLEval's section-order fix · hover a logo for details</figcaption></figure>
+    <figure class="chart glass wide"><div id="logos"></div><figcaption>pass@1 vs model size (log scale) · strict grading · hover a logo for details</figcaption></figure>
+    <figure class="chart glass wide">{{leaderboard}}<figcaption>pass@1 with 95% bootstrap CI over problems (5,000 resamples) · strict grading</figcaption></figure>
   </div>
 </section>
 

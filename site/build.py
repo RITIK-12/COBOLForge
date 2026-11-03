@@ -39,6 +39,9 @@ FRONTIER = [
     ("kimi-k3", "Kimi K3", "2.8T", None, "kimi"),  # kimi-color is near-white on the light badge
 ]
 OUR_ICON = "qwen-color"
+# KJ's COBOLEval run of grpo-v1 (step 37), shown in the table until its rows land in results/
+GRPO_REPORTED = {"passed": 73, "n": 146, "ci": [42.5, 58.2]}
+TABLE_NAMES = {BASE: "Qwen 3.8 27B base", SFT: "Our SFT", "kimi-k3": "Kimi K3 (strict)"}  # GRPO: added in main()
 ICONS = "https://cdn.jsdelivr.net/npm/@lobehub/icons-static-svg@1.95.1/icons/{}.svg"  # LobeHub Icons, pinned
 # Published COBOLEval pass@1, each from its own harness (COBOL-Coder arXiv 2604.03986 Table 3;
 # zorse-project/COBOLEval README)
@@ -218,7 +221,31 @@ def example():
     }
 
 
-def harness(sft, systems_stats):
+def boot_ci(res):
+    """95% bootstrap CI of pass@1 over problems, as eval/compare.py resamples (5,000, seed 0)."""
+    p = [int(r["pass"]) for r in res.values()]
+    n, rng = len(p), random.Random(SEED)
+    d = sorted(sum(p[rng.randrange(n)] for _ in range(n)) / n for _ in range(ITERS))
+    return [100 * d[int(0.025 * ITERS)], 100 * d[int(0.975 * ITERS) - 1]]
+
+
+def leaderboard_html(board, have_grpo):
+    """Same-harness table: pass@1 and 95% CI, ours highlighted."""
+    rows = [{"name": b["name"], "icon": b["icon"], "ours": b["ours"], "passed": b["passed"], "n": b["n"], "ci": b["ci"]}
+            for b in board]
+    if not have_grpo:
+        rows.append({"name": "Our GRPO", "icon": ICONS.format(OUR_ICON), "ours": True, **GRPO_REPORTED})
+    rows.sort(key=lambda r: (-r["passed"], not r["ours"]))
+    body = ""
+    for r in rows:
+        cls = ' class="ours"' if r["ours"] else ""
+        body += (f'<tr{cls}><td><i><img src="{r["icon"]}" alt=""></i>{html.escape(r["name"])}</td>'
+                 f'<td>{r["passed"]}/{r["n"]} ({100 * r["passed"] / r["n"]:.1f}%)</td>'
+                 f'<td>[{r["ci"][0]:.1f}%, {r["ci"][1]:.1f}%]</td></tr>')
+    return f'<table class="lb"><thead><tr><th>System</th><th>pass@1</th><th>95% CI</th></tr></thead><tbody>{body}</tbody></table>'
+
+
+def harness(sft, systems_stats, our_res):
     """Same-harness leaderboard: ours + every frontier model with all 146 rows, paired vs SFT."""
     fix_path = os.path.join(ROOT, "results/section_fix.json")
     fix = json.load(open(fix_path)) if os.path.exists(fix_path) else {}
@@ -232,6 +259,7 @@ def harness(sft, systems_stats):
             continue
         st, pr = system_stats(res), paired(sft, res)
         entry = {"label": label, "size": size, "think": think, "icon": ICONS.format(icon), "outcomes": st["outcomes"],
+                 "name": TABLE_NAMES.get(sid, label), "passed": st["passed"], "ci": boot_ci(res),
                  "n": st["n"], "compiled": st["compiled"], "pass": 100 * st["pass_rate"],
                  "fixed": 100 * fix.get(sid, {}).get("fixed", st["passed"]) / st["n"],
                  "cost": st["cost"] / st["n"], "diff": 100 * pr["diff"], "p": pr["p"], "ours": False,
@@ -240,9 +268,10 @@ def harness(sft, systems_stats):
             o, s = set(fix[sid]["fixed_ids"]), set(fix[SFT]["fixed_ids"])
             entry["p_fix"], entry["diff_fix"] = mcnemar_exact(len(o - s), len(s - o)), 100 * (len(o) - len(s)) / st["n"]
         out.append(entry)
-    for s, st in systems_stats.items():  # ours; the fine-tuned ones are highlighted, base stays muted
+    for s, st in systems_stats.items():  # ours: base, SFT, GRPO
         label = LABELS[s] if s == BASE else "Qwen 3.8 27B " + LABELS[s]
         out.append({"label": label, "size": "27B", "think": None, "icon": ICONS.format(OUR_ICON), "outcomes": st["outcomes"],
+                    "name": TABLE_NAMES.get(s, label), "passed": st["passed"], "ci": boot_ci(our_res[s]),
                     "n": st["n"], "compiled": st["compiled"], "pass": 100 * st["pass_rate"],
                     "fixed": 100 * fix.get(s, {}).get("fixed", st["passed"]) / st["n"],
                     "cost": st["cost"] / st["n"], "diff": None, "p": None, "ours": True, "hl": s != BASE})
@@ -273,6 +302,7 @@ def main():
         g = os.path.basename(grpo_files[-1])[:-6]
         systems.append(g)
         LABELS[g] = "+ SFT + GRPO"
+        TABLE_NAMES[g] = "Our GRPO"
     res = {s: results(s) for s in systems}
     stats = {s: system_stats(res[s]) for s in systems}
     pair = paired(base, sft)
@@ -281,14 +311,14 @@ def main():
     rl = grpo()
     ex = example()
     grpo_pair = paired(sft, res[systems[2]]) if grpo_files else None
-    board = harness(sft, stats)
+    board = harness(sft, stats, res)
     others = [b for b in board if not b["ours"]]
     ahead = [b["label"] for b in others if b["p"] < 0.05 and b["diff"] > 0]
     tied = [b["label"] for b in others if b["p"] >= 0.05]
     behind = [b["label"] for b in others if b["p"] < 0.05 and b["diff"] < 0]
     fix_ahead = [b["label"] for b in others if b["label"] not in ahead
                  and b["p_fix"] is not None and b["p_fix"] < 0.05 and b["diff_fix"] > 0]
-    fix_note = (f" With COBOLEval's section-order fix (hollow rings), {' and '.join(fix_ahead)} also move significantly ahead."
+    fix_note = (f" With COBOLEval's section-order fix, {' and '.join(fix_ahead)} also move significantly ahead (README)."
                 if fix_ahead else "")
 
     data = {
@@ -324,7 +354,9 @@ def main():
         grpo_status = (f"<b>{pct(gs['pass_rate'])}%</b><span>GRPO pass@1 ({gs['passed']}/{gs['n']}); "
                        f"{grpo_pair['diff'] * 100:+.1f} pts vs SFT, McNemar p = {grpo_pair['p']:.2g}</span>")
     elif run:
-        grpo_status = "<b>eval next</b><span>COBOLEval score lands here on the next push</span>"
+        g = GRPO_REPORTED  # KJ's eval; per-problem rows not pushed yet
+        grpo_status = (f"<b>{100 * g['passed'] / g['n']:.1f}%</b><span>GRPO pass@1 ({g['passed']}/{g['n']}) "
+                       f"vs SFT {pct(ss['pass_rate'])}%: no gain</span>")
     else:
         grpo_status = "<b>running</b><span>results land here on the next push</span>"
     vals = {
@@ -348,6 +380,7 @@ def main():
         "behind_names": ", ".join(behind) or "none", "fix_note": fix_note,
         "frontier_sizes": f"{min(others, key=size_b)['size']}–{max(others, key=size_b)['size']}" if others else "",
         "sft_cost_pp": f"{ss['cost'] / ss['n']:.4f}",
+        "leaderboard": leaderboard_html(board, bool(grpo_files)),
     }
 
     page = open(os.path.join(SITE, "index.html")).read()

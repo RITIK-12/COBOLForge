@@ -148,15 +148,18 @@
     if (!el || !D.harness.length) return;
     const pts = D.harness;
     const base = pts.find((p) => p.ours && !p.hl);
-    const tuned = pts.filter((p) => p.ours && p.hl);
-    const sft = tuned[0];
-    const short = (p) => (p.ours ? p.label.replace("Qwen 3.8 ", "") + (p.hl ? " (ours)" : "") : SHORT[p.label] || p.label);
+    const sft = pts.find((p) => p.ours && p.hl);
+    // ours (base, SFT, GRPO) share the Qwen logo and the ember ring; a short tag tells them apart
+    const tag = (p) => p.label.replace("Qwen 3.8 27B ", "").replace(/^\+ /, "").replace("SFT + GRPO", "GRPO");
+    el.classList.add("logo-wrap");
+    const plot = h("div", "plot");
+    el.appendChild(plot);
     let drawn = false;
     function draw() {
-      el.querySelector("svg")?.remove();
-      const W = el.clientWidth;
+      plot.querySelector("svg")?.remove();
+      const W = plot.clientWidth;
       if (!W) return;
-      const mob = W < 560, R = mob ? 13 : 17, H = mob ? 330 : 420, m = { l: 42, r: mob ? 18 : 120, t: 18, b: 34 };
+      const mob = W < 520, R = mob ? 13 : 17, H = mob ? 320 : 400, m = { l: 42, r: mob ? 16 : 64, t: 18, b: 34 };
       const lx0 = Math.log10(15), lx1 = Math.log10(4000);
       const X = (b) => m.l + ((Math.log10(b) - lx0) / (lx1 - lx0)) * (W - m.l - m.r);
       const Y = (v) => H - m.b - (v / 100) * (H - m.t - m.b);
@@ -173,52 +176,32 @@
       }
       // our SFT level, so ties read at a glance
       s("line", { x1: m.l, x2: W - m.r, y1: Y(sft.pass), y2: Y(sft.pass), stroke: css("--mark"), "stroke-opacity": 0.4 }, svg);
-      if (!mob) s("text", { x: W - m.r + 6, y: Y(sft.pass) + 3.5, fill: css("--ember") }, svg).textContent = "our 27B";
+      if (!mob) s("text", { x: W - m.r + 6, y: Y(sft.pass) + 3.5, fill: css("--ember") }, svg).textContent = "our SFT";
       // positions, nudging badges that would overlap
       const pos = new Map();
       [...pts].sort((a, b) => a.params - b.params || b.pass - a.pass).forEach((p) => {
-        let x = X(p.params), y = Y(p.pass);
+        let x = X(p.params);
+        const y = Y(p.pass);
         for (const [, q] of pos) {
           if (Math.abs(q.x - x) < 2 * R + 2 && Math.abs(q.y - y) < 2 * R + 2) x = q.x + 2 * R + 4;
         }
         pos.set(p, { x, y });
       });
-      // section-order fix: hollow ring above the strict score
-      for (const p of pts) {
-        if (!(p.fixed > p.pass + 0.01)) continue;
-        const { x, y } = pos.get(p);
-        s("line", { x1: x, x2: x, y1: y - R, y2: Y(p.fixed) + R - 3, stroke: "rgba(255,255,255,0.3)", "stroke-width": 1.5 }, svg);
-        const ring = s("circle", { cx: x, cy: Y(p.fixed), r: R - 3, fill: "none", stroke: "rgba(255,255,255,0.55)", "stroke-width": 1.5 }, svg);
-        bind(ring, tipFor(p));
-      }
-      // base -> SFT
       const pb = pos.get(base), ps = pos.get(sft);
       const arrow = s("line", { x1: pb.x, x2: ps.x, y1: pb.y - R - 4, y2: ps.y + R + 4, stroke: css("--mark"), "stroke-width": 2.5, "marker-end": "url(#arr)" }, svg);
       s("text", { x: pb.x + 10, y: (pb.y + ps.y) / 2 + 4, fill: css("--ember") }, svg).textContent = `+${(sft.pass - base.pass).toFixed(1)} pts`;
       for (const p of pts) {
         const { x, y } = pos.get(p);
         const g = s("g", { class: "badge" }, svg);
-        s("circle", { cx: x, cy: y, r: R, fill: "#f6f3ea", stroke: p.hl ? css("--mark") : p.ours ? "#8a8f9c" : "rgba(255,255,255,0.25)", "stroke-width": p.hl ? 3 : 1.5 }, g);
+        s("circle", { cx: x, cy: y, r: R, fill: "#f6f3ea", stroke: p.ours ? css("--mark") : "rgba(255,255,255,0.25)", "stroke-width": p.ours ? 3 : 1.5 }, g);
         const sz = R * 1.25;
         s("image", { href: p.icon, x: x - sz / 2, y: y - sz / 2, width: sz, height: sz }, g);
-        if (!mob) {
-          // label right of the badge; left if a badge or section-fix line is in the way; below if both are
-          const LW = 7 * short(p).length + R + 8;
-          const blocked = (side) => pts.some((q) => {
-            if (q === p) return false;
-            const o = pos.get(q), dx = (o.x - x) * side;
-            const span = q.fixed > q.pass + 0.01 ? [Y(q.fixed), o.y] : [o.y - R, o.y + R];
-            return dx > 0 && dx < LW && y > span[0] - R && y < span[1] + R;
-          });
-          const [lx, ly, anchor] = !blocked(1) ? [x + R + 6, y + 3.5, "start"]
-            : !blocked(-1) ? [x - R - 6, y + 3.5, "end"] : [x, y + R + 13, "middle"];
-          s("text", { x: lx, y: ly, "text-anchor": anchor, fill: p.hl ? css("--ember") : css("--ink-dim") }, g).textContent = short(p);
-        }
+        if (p.ours) s("text", { x: x - R - 6, y: y + 3.5, "text-anchor": "end", fill: css("--ember") }, g).textContent = tag(p);
         bind(g, tipFor(p));
       }
-      el.prepend(svg);
+      plot.prepend(svg);
       if (!drawn && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        const len = arrow.getTotalLength ? Math.hypot(ps.x - pb.x, ps.y - pb.y) : 0;
+        const len = Math.hypot(ps.x - pb.x, ps.y - pb.y);
         arrow.style.strokeDasharray = len;
         arrow.style.strokeDashoffset = len;
         const go = () => { arrow.style.transition = "stroke-dashoffset 1.2s cubic-bezier(.3,.6,.2,1) .3s"; arrow.style.strokeDashoffset = 0; };
@@ -229,19 +212,19 @@
       drawn = true;
     }
     draw();
-    let last = el.clientWidth;
-    new ResizeObserver(() => { if (el.clientWidth !== last) { last = el.clientWidth; draw(); } }).observe(el);
-    // legend: which logo is which model
+    let last = plot.clientWidth;
+    new ResizeObserver(() => { if (plot.clientWidth !== last) { last = plot.clientWidth; draw(); } }).observe(plot);
+    // legend: one column on the right (below on phones), ours first, then by pass@1
     const lg = h("div", "logo-legend");
     [...pts].sort((a, b) => b.ours - a.ours || b.pass - a.pass).forEach((p) => {
-      const item = h("span", "lg" + (p.hl ? " hl" : ""),
-        `<i><img src="${p.icon}" alt=""></i><span>${p.label} <small>${p.size}${p.think ? " · thinking " + p.think : ""} · ${p.pass.toFixed(1)}%${p.fixed > p.pass + 0.01 ? ` (${p.fixed.toFixed(1)}% fixed)` : ""}</small></span>`);
+      const item = h("span", "lg" + (p.ours ? " ours" : ""),
+        `<i><img src="${p.icon}" alt=""></i><span>${p.name}</span><b>${p.pass.toFixed(1)}%</b>`);
       bind(item, tipFor(p));
       lg.appendChild(item);
     });
     el.appendChild(lg);
     srTable(el, "Same-harness COBOLEval pass@1", ["Model", "Size", "pass@1 % strict", "pass@1 % with section fix", "$/problem", "p vs SFT"],
-      pts.map((x) => [x.label, x.size, x.pass.toFixed(1), x.fixed.toFixed(1), x.cost.toFixed(4), x.p == null ? "" : x.p.toPrecision(2)]));
+      pts.map((x) => [x.name, x.size, x.pass.toFixed(1), x.fixed.toFixed(1), x.cost.toFixed(4), x.p == null ? "" : x.p.toPrecision(2)]));
   }
 
   function published() {
@@ -255,8 +238,8 @@
   }
 
   // ---- outcomes: 100% stacked bars per system ----
-  const OUT = [["pass", "s-pass", "--good", "✓ pass"], ["wrong answer", "s-wrong", "--warn", "≠ wrong answer"],
-    ["compile error", "s-compile", "--crit", "✕ compile error"], ["blocked", "s-blocked", null, "⊘ blocked"]];
+  const OUT = [["pass", "s-pass", "--good", "✓ pass"], ["wrong answer", "s-wrong", "--crit", "✕ wrong answer"],
+    ["compile error", "s-compile", "--serious", "! compile error"], ["blocked", "s-blocked", null, "⊘ blocked"]];
   function outcomes() {
     const el = $("#outcomes");
     // ours first (base, SFT, GRPO), then the frontier models by pass@1
